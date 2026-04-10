@@ -924,6 +924,37 @@ class OdooConnection:
             sanitized_message = ErrorSanitizer.sanitize_message(str(e))
             raise OdooConnectionError(f"Operation failed: {sanitized_message}") from e
 
+    def execute_kw_as_user(
+        self, user_id: int, model: str, method: str, args: List[Any], kwargs: Dict[str, Any]
+    ) -> Any:
+        """Execute a model method as a specific Odoo user.
+
+        Delegates to ``res.users.mcp_execute_as_user`` installed by the
+        foxlogik_claude_automation module.  The admin session is used for the
+        outer XML-RPC call; Odoo switches the execution environment to
+        ``env(user=user_id)`` server-side, so record rules, field-level access
+        and group restrictions all apply for the target user.
+
+        Args:
+            user_id: Odoo user ID to impersonate.
+            model: Model name for the inner call (e.g. 'project.task').
+            method: ORM method name (e.g. 'search_read').
+            args: Positional arguments for the inner call.
+            kwargs: Keyword arguments for the inner call.
+
+        Returns:
+            The result of the inner method call.
+
+        Raises:
+            OdooConnectionError: If the call fails or the module is not installed.
+        """
+        return self.execute_kw(
+            "res.users",
+            "mcp_execute_as_user",
+            [user_id, model, method, args, kwargs],
+            {},
+        )
+
     def search(self, model: str, domain: List[Union[str, List[Any]]], **kwargs) -> List[int]:
         """Search for records matching a domain.
 
