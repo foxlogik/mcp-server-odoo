@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- **Per-user security context**: All data tools (`search_records`, `get_record`, `create_record`, `update_record`, `delete_record`) now accept an optional `user_id` parameter. When set, the operation runs under that user's Odoo security context — record rules and access rights are enforced for that user rather than the service account. Requires the `foxlogik_claude_automation` module.
+
 ## [0.5.0] - 2026-02-28
 
 ### Added

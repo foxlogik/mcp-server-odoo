@@ -359,6 +359,7 @@ class OdooToolHandler:
             limit: int = 10,
             offset: int = 0,
             order: Optional[str] = None,
+            user_id: Optional[int] = None,
             ctx: Optional[Context] = None,
         ) -> SearchResult:
             """Search for records in an Odoo model.
@@ -377,12 +378,16 @@ class OdooToolHandler:
                 limit: Maximum number of records to return
                 offset: Number of records to skip
                 order: Sort order (e.g., 'name asc')
+                user_id: Optional Odoo user ID. When provided the search runs
+                    under that user's security context (record rules and access
+                    rights are enforced for that user). Requires the
+                    foxlogik_claude_automation module to be installed.
 
             Returns:
                 Search results with records, total count, and pagination info
             """
             result = await self._handle_search_tool(
-                model, domain, fields, limit, offset, order, ctx
+                model, domain, fields, limit, offset, order, ctx, user_id=user_id
             )
             return SearchResult(**result)
 
@@ -399,6 +404,7 @@ class OdooToolHandler:
             model: str,
             record_id: int,
             fields: Optional[List[str]] = None,
+            user_id: Optional[int] = None,
             ctx: Optional[Context] = None,
         ) -> RecordResult:
             """Get a specific record by ID with smart field selection.
@@ -413,6 +419,9 @@ class OdooToolHandler:
                     - None (default): Returns smart selection of common fields
                     - ["field1", "field2", ...]: Returns only specified fields
                     - ["__all__"]: Returns ALL fields (warning: can be very large)
+                user_id: Optional Odoo user ID. When provided the read runs
+                    under that user's security context. Requires the
+                    foxlogik_claude_automation module to be installed.
 
             Workflow for field discovery:
             1. To see all available fields for a model, use the resource:
@@ -434,7 +443,7 @@ class OdooToolHandler:
                 Record data with requested fields. When using smart defaults,
                 includes metadata with field statistics.
             """
-            return await self._handle_get_record_tool(model, record_id, fields, ctx)
+            return await self._handle_get_record_tool(model, record_id, fields, ctx, user_id=user_id)
 
         @self.app.tool(
             title="List Models",
@@ -489,6 +498,7 @@ class OdooToolHandler:
         async def create_record(
             model: str,
             values: Dict[str, Any],
+            user_id: Optional[int] = None,
             ctx: Optional[Context] = None,
         ) -> CreateResult:
             """Create a new record in an Odoo model.
@@ -496,11 +506,14 @@ class OdooToolHandler:
             Args:
                 model: The Odoo model name (e.g., 'res.partner')
                 values: Field values for the new record
+                user_id: Optional Odoo user ID. When provided the create runs
+                    under that user's security context. Requires the
+                    foxlogik_claude_automation module to be installed.
 
             Returns:
                 Created record details with ID, URL, and confirmation.
             """
-            result = await self._handle_create_record_tool(model, values, ctx)
+            result = await self._handle_create_record_tool(model, values, ctx, user_id=user_id)
             return CreateResult(**result)
 
         @self.app.tool(
@@ -516,6 +529,7 @@ class OdooToolHandler:
             model: str,
             record_id: int,
             values: Dict[str, Any],
+            user_id: Optional[int] = None,
             ctx: Optional[Context] = None,
         ) -> UpdateResult:
             """Update an existing record.
@@ -524,11 +538,14 @@ class OdooToolHandler:
                 model: The Odoo model name (e.g., 'res.partner')
                 record_id: The record ID to update
                 values: Field values to update
+                user_id: Optional Odoo user ID. When provided the write runs
+                    under that user's security context. Requires the
+                    foxlogik_claude_automation module to be installed.
 
             Returns:
                 Updated record details with confirmation.
             """
-            result = await self._handle_update_record_tool(model, record_id, values, ctx)
+            result = await self._handle_update_record_tool(model, record_id, values, ctx, user_id=user_id)
             return UpdateResult(**result)
 
         @self.app.tool(
@@ -543,6 +560,7 @@ class OdooToolHandler:
         async def delete_record(
             model: str,
             record_id: int,
+            user_id: Optional[int] = None,
             ctx: Optional[Context] = None,
         ) -> DeleteResult:
             """Delete a record.
@@ -550,11 +568,14 @@ class OdooToolHandler:
             Args:
                 model: The Odoo model name (e.g., 'res.partner')
                 record_id: The record ID to delete
+                user_id: Optional Odoo user ID. When provided the delete runs
+                    under that user's security context. Requires the
+                    foxlogik_claude_automation module to be installed.
 
             Returns:
                 Deletion confirmation with the deleted record's name and ID.
             """
-            result = await self._handle_delete_record_tool(model, record_id, ctx)
+            result = await self._handle_delete_record_tool(model, record_id, ctx, user_id=user_id)
             return DeleteResult(**result)
 
     async def _handle_search_tool(
@@ -566,6 +587,7 @@ class OdooToolHandler:
         offset: int,
         order: Optional[str],
         ctx=None,
+        user_id: Optional[int] = None,
     ) -> Dict[str, Any]:
         """Handle search tool request."""
         try:
@@ -648,13 +670,30 @@ class OdooToolHandler:
                     limit = self.config.default_limit
 
                 # Get total count
-                total_count = self.connection.search_count(model, parsed_domain)
+                if user_id is not None:
+                    total_count = self.connection.execute_kw_as_user(
+                        user_id, model, "search_count", [parsed_domain], {}
+                    )
+                else:
+                    total_count = self.connection.search_count(model, parsed_domain)
                 await self._ctx_progress(ctx, 1, 3, f"Found {total_count} records")
 
                 # Search for records
-                record_ids = self.connection.search(
-                    model, parsed_domain, limit=limit, offset=offset, order=order
-                )
+                search_kwargs: Dict[str, Any] = {}
+                if limit > 0:
+                    search_kwargs["limit"] = limit
+                if offset:
+                    search_kwargs["offset"] = offset
+                if order:
+                    search_kwargs["order"] = order
+                if user_id is not None:
+                    record_ids = self.connection.execute_kw_as_user(
+                        user_id, model, "search", [parsed_domain], search_kwargs
+                    )
+                else:
+                    record_ids = self.connection.search(
+                        model, parsed_domain, limit=limit, offset=offset, order=order
+                    )
 
                 # Determine which fields to fetch
                 fields_to_fetch = parsed_fields
@@ -677,7 +716,12 @@ class OdooToolHandler:
                 # Read records
                 records = []
                 if record_ids:
-                    records = self.connection.read(model, record_ids, fields_to_fetch)
+                    if user_id is not None:
+                        records = self.connection.execute_kw_as_user(
+                            user_id, model, "read", [record_ids, fields_to_fetch], {}
+                        )
+                    else:
+                        records = self.connection.read(model, record_ids, fields_to_fetch)
                     # Process datetime fields in each record
                     records = [self._process_record_dates(record, model) for record in records]
                 await self._ctx_progress(ctx, 3, 3, f"Returning {len(records)} records")
@@ -705,6 +749,7 @@ class OdooToolHandler:
         record_id: int,
         fields: Optional[List[str]],
         ctx=None,
+        user_id: Optional[int] = None,
     ) -> RecordResult:
         """Handle get record tool request."""
         try:
@@ -741,7 +786,12 @@ class OdooToolHandler:
                     logger.debug(f"Fetching specific fields for {model}: {fields}")
 
                 # Read the record
-                records = self.connection.read(model, [record_id], fields_to_fetch)
+                if user_id is not None:
+                    records = self.connection.execute_kw_as_user(
+                        user_id, model, "read", [[record_id], fields_to_fetch], {}
+                    )
+                else:
+                    records = self.connection.read(model, [record_id], fields_to_fetch)
 
                 if not records:
                     raise ValidationError(f"Record not found: {model} with ID {record_id}")
@@ -993,6 +1043,7 @@ class OdooToolHandler:
         model: str,
         values: Dict[str, Any],
         ctx=None,
+        user_id: Optional[int] = None,
     ) -> Dict[str, Any]:
         """Handle create record tool request."""
         try:
@@ -1010,7 +1061,12 @@ class OdooToolHandler:
                     raise ValidationError("No values provided for record creation")
 
                 # Create the record
-                record_id = self.connection.create(model, values)
+                if user_id is not None:
+                    record_id = self.connection.execute_kw_as_user(
+                        user_id, model, "create", [values], {}
+                    )
+                else:
+                    record_id = self.connection.create(model, values)
 
                 # Return only essential fields to minimize context usage
                 # Users can use get_record if they need more fields
@@ -1018,7 +1074,12 @@ class OdooToolHandler:
                 essential_fields = ["id", "display_name"]
 
                 # Read only the essential fields
-                records = self.connection.read(model, [record_id], essential_fields)
+                if user_id is not None:
+                    records = self.connection.execute_kw_as_user(
+                        user_id, model, "read", [[record_id], essential_fields], {}
+                    )
+                else:
+                    records = self.connection.read(model, [record_id], essential_fields)
                 if not records:
                     raise ValidationError(
                         f"Failed to read created record: {model} with ID {record_id}"
@@ -1053,6 +1114,7 @@ class OdooToolHandler:
         record_id: int,
         values: Dict[str, Any],
         ctx=None,
+        user_id: Optional[int] = None,
     ) -> Dict[str, Any]:
         """Handle update record tool request."""
         try:
@@ -1070,12 +1132,22 @@ class OdooToolHandler:
                     raise ValidationError("No values provided for record update")
 
                 # Check if record exists (only fetch ID to verify existence)
-                existing = self.connection.read(model, [record_id], ["id"])
+                if user_id is not None:
+                    existing = self.connection.execute_kw_as_user(
+                        user_id, model, "read", [[record_id], ["id"]], {}
+                    )
+                else:
+                    existing = self.connection.read(model, [record_id], ["id"])
                 if not existing:
                     raise NotFoundError(f"Record not found: {model} with ID {record_id}")
 
                 # Update the record
-                success = self.connection.write(model, [record_id], values)
+                if user_id is not None:
+                    success = self.connection.execute_kw_as_user(
+                        user_id, model, "write", [[record_id], values], {}
+                    )
+                else:
+                    success = self.connection.write(model, [record_id], values)
 
                 # Return only essential fields to minimize context usage
                 # Users can use get_record if they need more fields
@@ -1083,7 +1155,12 @@ class OdooToolHandler:
                 essential_fields = ["id", "display_name"]
 
                 # Read only the essential fields
-                records = self.connection.read(model, [record_id], essential_fields)
+                if user_id is not None:
+                    records = self.connection.execute_kw_as_user(
+                        user_id, model, "read", [[record_id], essential_fields], {}
+                    )
+                else:
+                    records = self.connection.read(model, [record_id], essential_fields)
                 if not records:
                     raise ValidationError(
                         f"Failed to read updated record: {model} with ID {record_id}"
@@ -1119,6 +1196,7 @@ class OdooToolHandler:
         model: str,
         record_id: int,
         ctx=None,
+        user_id: Optional[int] = None,
     ) -> Dict[str, Any]:
         """Handle delete record tool request."""
         try:
@@ -1132,7 +1210,12 @@ class OdooToolHandler:
                     raise ValidationError("Not authenticated with Odoo")
 
                 # Check if record exists and get display info
-                existing = self.connection.read(model, [record_id], ["id", "display_name"])
+                if user_id is not None:
+                    existing = self.connection.execute_kw_as_user(
+                        user_id, model, "read", [[record_id], ["id", "display_name"]], {}
+                    )
+                else:
+                    existing = self.connection.read(model, [record_id], ["id", "display_name"])
                 if not existing:
                     raise NotFoundError(f"Record not found: {model} with ID {record_id}")
 
@@ -1140,7 +1223,12 @@ class OdooToolHandler:
                 record_name = existing[0].get("display_name", f"ID {record_id}")
 
                 # Delete the record
-                success = self.connection.unlink(model, [record_id])
+                if user_id is not None:
+                    success = self.connection.execute_kw_as_user(
+                        user_id, model, "unlink", [[record_id]], {}
+                    )
+                else:
+                    success = self.connection.unlink(model, [record_id])
 
                 return {
                     "success": success,
