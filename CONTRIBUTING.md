@@ -143,7 +143,7 @@ __main__.py → OdooConfig → OdooMCPServer → OdooConnection → FastMCP
 |--------|---------------|
 | `server.py` | Orchestrates startup, registers handlers on FastMCP |
 | `config.py` | `OdooConfig` dataclass from env vars, singleton via `get_config()` |
-| `odoo_connection.py` | XML-RPC proxies, auth, CRUD convenience methods, caching |
+| `odoo_connection.py` | XML-RPC proxies, auth, CRUD convenience methods, user-context impersonation, caching |
 | `tools.py` | MCP tool handlers (search, get, create, update, delete, list) |
 | `resources.py` | MCP resource handlers with URI patterns |
 | `schemas.py` | Pydantic models for structured tool return types |

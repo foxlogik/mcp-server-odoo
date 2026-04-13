@@ -25,6 +25,7 @@ An MCP server that enables AI assistants like Claude to interact with Odoo ERP s
 - 💬 **LLM-optimized output** with hierarchical text formatting
 - 🌍 **Multi-language support** — get responses in your preferred language
 - 🚀 **YOLO Mode** for quick access with any Odoo instance (no module required)
+- 👤 **Per-user security context** — run any operation under a specific Odoo user's record rules and access rights
 
 ## Installation
 
@@ -509,9 +510,12 @@ Search for records in any Odoo model with filters.
   "model": "res.partner",
   "domain": [["is_company", "=", true], ["country_id.code", "=", "ES"]],
   "fields": ["name", "email", "phone"],
-  "limit": 10
+  "limit": 10,
+  "user_id": 7
 }
 ```
+
+`user_id` is optional. When set, the search runs under that Odoo user's security context — record rules and access rights are enforced for that user. Requires the `foxlogik_claude_automation` module.
 
 **Field Selection Options:**
 - Omit `fields` or set to `null`: Returns smart selection of common fields
@@ -525,9 +529,12 @@ Retrieve a specific record by ID.
 {
   "model": "res.partner",
   "record_id": 42,
-  "fields": ["name", "email", "street", "city"]
+  "fields": ["name", "email", "street", "city"],
+  "user_id": 7
 }
 ```
+
+`user_id` is optional. When set, the read runs under that user's security context.
 
 **Field Selection Options:**
 - Omit `fields` or set to `null`: Returns smart selection of common fields with metadata
@@ -558,9 +565,12 @@ Create a new record in Odoo.
     "name": "New Customer",
     "email": "customer@example.com",
     "is_company": true
-  }
+  },
+  "user_id": 7
 }
 ```
+
+`user_id` is optional. When set, the create runs under that user's security context.
 
 ### `update_record`
 Update an existing record.
@@ -572,9 +582,12 @@ Update an existing record.
   "values": {
     "phone": "+1234567890",
     "website": "https://example.com"
-  }
+  },
+  "user_id": 7
 }
 ```
+
+`user_id` is optional. When set, the update runs under that user's security context.
 
 ### `delete_record`
 Delete a record from Odoo.
@@ -582,9 +595,23 @@ Delete a record from Odoo.
 ```json
 {
   "model": "res.partner",
-  "record_id": 42
+  "record_id": 42,
+  "user_id": 7
 }
 ```
+
+`user_id` is optional. When set, the delete runs under that user's security context.
+
+### User Security Context
+
+All data tools accept an optional `user_id` parameter. When set, the operation runs under that Odoo user's security context — record rules, field-level access, and group restrictions are all enforced for that user rather than the authenticated service account.
+
+This is useful when:
+- You want reads/writes attributed to a specific user
+- You need to respect per-user record visibility rules
+- You're building multi-tenant workflows where each caller should only see their own data
+
+**Prerequisite:** requires the `foxlogik_claude_automation` module installed in your Odoo instance. Without it, `user_id` calls will return an error.
 
 ### Smart Field Selection
 
