@@ -22,6 +22,7 @@ from .error_sanitizer import ErrorSanitizer
 from .logging_config import get_logger, perf_logger
 from .odoo_connection import OdooConnection, OdooConnectionError
 from .schemas import (
+    CallMethodResult,
     CreateResult,
     DeleteResult,
     FieldSelectionMetadata,
@@ -33,6 +34,32 @@ from .schemas import (
 )
 
 logger = get_logger(__name__)
+
+# Methods callable via the `call_method` tool, keyed by model.
+#
+# This is a deliberately tight allowlist: `call_method` can invoke an arbitrary
+# model method, so only vetted, side-effect-safe helpers are exposed. Anything
+# not listed here is rejected before reaching Odoo.
+#
+# The bpm.process helpers below are read-only or creation-only — they never
+# enable or promote a workflow (foxlogik_bpmn_workflow's bpm.process.write guard
+# enforces draft/disabled server-side regardless).
+METHOD_CALL_ALLOWLIST: Dict[str, set] = {
+    "bpm.process": {
+        "validate_bpmn_xml",
+        "get_builder_reference",
+        "create_draft_process_from_spec",
+    },
+}
+
+# Minimum model operation each allowlisted method requires, for access-control
+# validation (the model must be MCP-enabled for this operation). Defaults to
+# "read" when a (model, method) pair is absent.
+METHOD_REQUIRED_OPERATION: Dict[tuple, str] = {
+    ("bpm.process", "validate_bpmn_xml"): "read",
+    ("bpm.process", "get_builder_reference"): "read",
+    ("bpm.process", "create_draft_process_from_spec"): "create",
+}
 
 
 class OdooToolHandler:
@@ -577,6 +604,52 @@ class OdooToolHandler:
             """
             result = await self._handle_delete_record_tool(model, record_id, ctx, user_id=user_id)
             return DeleteResult(**result)
+
+        @self.app.tool(
+            title="Call Method",
+            annotations=ToolAnnotations(
+                readOnlyHint=False,
+                destructiveHint=False,
+                idempotentHint=False,
+                openWorldHint=True,
+            ),
+        )
+        async def call_method(
+            model: str,
+            method: str,
+            args: Optional[Any] = None,
+            kwargs: Optional[Any] = None,
+            user_id: Optional[int] = None,
+            ctx: Optional[Context] = None,
+        ) -> CallMethodResult:
+            """Call an allowlisted model method on Odoo.
+
+            For bespoke model methods that are not plain CRUD. Only methods on the
+            server-side allowlist can be invoked; anything else is rejected.
+
+            Currently allowed:
+                - bpm.process.get_builder_reference(model_name)
+                - bpm.process.validate_bpmn_xml(xml_str, model_name=None)
+                - bpm.process.create_draft_process_from_spec(spec)
+
+            Args:
+                model: The Odoo model name (e.g. 'bpm.process').
+                method: The method to call. Must be allowlisted for this model.
+                args: Positional arguments — a list, or a JSON string encoding a
+                    list (e.g. '["<xml>", "project.task"]'). Defaults to [].
+                kwargs: Keyword arguments — a dict, or a JSON string encoding a
+                    dict. Defaults to {}.
+                user_id: Optional Odoo user ID. When provided the call runs under
+                    that user's security context. Requires the
+                    foxlogik_claude_automation / foxlogik_mcp_proxy module.
+
+            Returns:
+                The raw return value of the method, wrapped with success/message.
+            """
+            result = await self._handle_call_method_tool(
+                model, method, args, kwargs, ctx, user_id=user_id
+            )
+            return CallMethodResult(**result)
 
     async def _handle_search_tool(
         self,
@@ -1249,6 +1322,85 @@ class OdooToolHandler:
             logger.error(f"Error in delete_record tool: {e}")
             sanitized_msg = ErrorSanitizer.sanitize_message(str(e))
             raise ValidationError(f"Failed to delete record: {sanitized_msg}") from e
+
+    @staticmethod
+    def _coerce_json(value: Any, default: Any, name: str, expect: type) -> Any:
+        """Normalize an args/kwargs value that may arrive as a JSON string.
+
+        Accepts a native list/dict, a JSON string encoding one, or None (→ default).
+        Raises ValidationError if the value is the wrong shape.
+        """
+        if value is None:
+            return default
+        if isinstance(value, str):
+            try:
+                value = json.loads(value)
+            except json.JSONDecodeError as e:
+                raise ValidationError(f"'{name}' is not valid JSON: {e}") from e
+        if not isinstance(value, expect):
+            raise ValidationError(
+                f"'{name}' must be a {expect.__name__} (got {type(value).__name__})"
+            )
+        return value
+
+    async def _handle_call_method_tool(
+        self,
+        model: str,
+        method: str,
+        args: Any = None,
+        kwargs: Any = None,
+        ctx=None,
+        user_id: Optional[int] = None,
+    ) -> Dict[str, Any]:
+        """Handle call_method tool request (allowlisted model methods only)."""
+        try:
+            with perf_logger.track_operation("tool_call_method", model=model):
+                # Allowlist gate — reject any non-vetted (model, method) before Odoo.
+                allowed = METHOD_CALL_ALLOWLIST.get(model, set())
+                if method not in allowed:
+                    raise ValidationError(
+                        f"Method '{method}' is not callable on '{model}' via call_method. "
+                        f"Allowed methods for this model: {sorted(allowed) or 'none'}."
+                    )
+
+                # Access control — the model must be MCP-enabled for the operation
+                # this method implies (read for inspectors, create for the builder).
+                required_op = METHOD_REQUIRED_OPERATION.get((model, method), "read")
+                self.access_controller.validate_model_access(model, required_op)
+
+                if not self.connection.is_authenticated:
+                    raise ValidationError("Not authenticated with Odoo")
+
+                call_args = self._coerce_json(args, default=[], name="args", expect=list)
+                call_kwargs = self._coerce_json(kwargs, default={}, name="kwargs", expect=dict)
+
+                await self._ctx_info(ctx, f"Calling {model}.{method}()...")
+
+                if user_id is not None:
+                    result = self.connection.execute_kw_as_user(
+                        user_id, model, method, call_args, call_kwargs
+                    )
+                else:
+                    result = self.connection.execute_kw(model, method, call_args, call_kwargs)
+
+                return {
+                    "success": True,
+                    "model": model,
+                    "method": method,
+                    "result": result,
+                    "message": f"Successfully called {model}.{method}()",
+                }
+
+        except ValidationError:
+            raise
+        except AccessControlError as e:
+            raise ValidationError(f"Access denied: {e}") from e
+        except OdooConnectionError as e:
+            raise ValidationError(f"Connection error: {e}") from e
+        except Exception as e:
+            logger.error(f"Error in call_method tool: {e}")
+            sanitized_msg = ErrorSanitizer.sanitize_message(str(e))
+            raise ValidationError(f"Failed to call method: {sanitized_msg}") from e
 
 
 def register_tools(
