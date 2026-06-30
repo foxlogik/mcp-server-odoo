@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **`call_method` tool**: invoke an allowlisted bespoke model method (not just CRUD). Methods must be listed in `METHOD_CALL_ALLOWLIST` (`tools.py`) — a deliberately tight gate since the tool can run arbitrary model methods. Initially exposes the `bpm.process` BPMN-builder helpers (`get_builder_reference`, `validate_bpmn_xml`, `create_draft_process_from_spec`). Accepts `args`/`kwargs` as native values or JSON strings, supports the optional `user_id` impersonation, and enforces model access control (read for inspectors, create for the builder).
 - **Per-user security context**: All data tools (`search_records`, `get_record`, `create_record`, `update_record`, `delete_record`) now accept an optional `user_id` parameter. When set, the operation runs under that user's Odoo security context — record rules and access rights are enforced for that user rather than the service account. Requires the `foxlogik_claude_automation` module.
 
 ## [0.5.0] - 2026-02-28

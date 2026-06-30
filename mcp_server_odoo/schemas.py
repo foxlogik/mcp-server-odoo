@@ -156,3 +156,16 @@ class DeleteResult(BaseModel):
     deleted_id: int = Field(description="ID of the deleted record")
     deleted_name: str = Field(description="Display name of the deleted record")
     message: str = Field(description="Human-readable success message")
+
+
+# --- Call Method ---
+
+
+class CallMethodResult(BaseModel):
+    """Result of calling an allowlisted model method via the call_method tool."""
+
+    success: bool = Field(description="Whether the method call succeeded")
+    model: str = Field(description="Model the method was called on")
+    method: str = Field(description="Method name that was called")
+    result: Any = Field(default=None, description="Raw return value from the Odoo method")
+    message: str = Field(description="Human-readable confirmation message")

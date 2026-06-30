@@ -602,6 +602,30 @@ Delete a record from Odoo.
 
 `user_id` is optional. When set, the delete runs under that user's security context.
 
+### `call_method`
+Call an **allowlisted** bespoke model method (for logic that is not plain CRUD).
+
+```json
+{
+  "model": "bpm.process",
+  "method": "get_builder_reference",
+  "args": ["project.task"],
+  "user_id": 7
+}
+```
+
+- `args` / `kwargs` may be passed as native list/dict or as JSON strings.
+- `user_id` is optional and runs the call under that user's security context.
+- Only methods on the server-side allowlist (`METHOD_CALL_ALLOWLIST` in `tools.py`) can be
+  invoked; anything else is rejected before reaching Odoo. This is deliberately tight because
+  `call_method` can run arbitrary model methods. Currently allowlisted:
+  - `bpm.process.get_builder_reference(model_name)`
+  - `bpm.process.validate_bpmn_xml(xml_str, model_name=None)`
+  - `bpm.process.create_draft_process_from_spec(spec)`
+
+To expose another method, add its `(model, method)` to `METHOD_CALL_ALLOWLIST` (and an entry in
+`METHOD_REQUIRED_OPERATION` for the access-control operation it needs).
+
 ### User Security Context
 
 All data tools accept an optional `user_id` parameter. When set, the operation runs under that Odoo user's security context — record rules, field-level access, and group restrictions are all enforced for that user rather than the authenticated service account.
