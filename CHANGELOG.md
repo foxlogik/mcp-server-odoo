@@ -8,7 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Per-user metadata tools**: `get_fields` (fields_get — types, labels, required, relations, selection values), `get_defaults` (default_get) and `check_access` (check_access_rights, non-raising). In pinned sessions (or with `user_id`) they compute as that user, so `groups=`-protected fields are absent and access answers are real. These are the discovery channels for pinned sessions — normal users cannot read `ir.model` / `ir.model.fields` raw (admin-only ACL in Odoo core), and resources are unregistered when pinned.
 - **Act-as-uid session pinning** (`ODOO_ACT_AS_UID`): when set to a positive user id, every tool call is clamped to that user via `res.users.mcp_execute_as_user` — a model-supplied `user_id` is ignored (logged). Startup logs `act-as-uid pinning ACTIVE` so deployments are verifiable; version bumped to 0.6.0 for the same reason.
+
+### Fixed
+- **Smart default fields in pinned sessions**: field selection for `search_records`/`get_record` derived from the admin connection's `fields_get`, so it could pick `groups=`-protected fields the pinned user cannot read — the explicit read then raised AccessError and failed the whole call. Selection now uses the effective user's `fields_get`, dropping protected fields automatically.
 
 ### Security
 - **Pinned sessions skip resource registration**: `odoo://` resources read through the raw admin connection, which would bypass act-as-uid pinning — they are no longer registered when the session is pinned (fail closed; tools cover the same reads under the pinned user).

@@ -22,10 +22,13 @@ from .error_sanitizer import ErrorSanitizer
 from .logging_config import get_logger, perf_logger
 from .odoo_connection import OdooConnection, OdooConnectionError
 from .schemas import (
+    AccessCheckResult,
     CallMethodResult,
     CreateResult,
+    DefaultsResult,
     DeleteResult,
     FieldSelectionMetadata,
+    FieldsResult,
     ModelsResult,
     RecordResult,
     ResourceTemplatesResult,
@@ -60,6 +63,19 @@ METHOD_REQUIRED_OPERATION: Dict[tuple, str] = {
     ("bpm.process", "get_builder_reference"): "read",
     ("bpm.process", "create_draft_process_from_spec"): "create",
 }
+
+# Compact default attribute set for get_fields — full fields_get output is very
+# large; these cover what a model needs to build a create/write proposal.
+DEFAULT_FIELD_ATTRIBUTES = [
+    "string",
+    "type",
+    "required",
+    "readonly",
+    "relation",
+    "selection",
+    "help",
+    "store",
+]
 
 
 class OdooToolHandler:
@@ -306,18 +322,40 @@ class OdooToolHandler:
 
         return max(score, 0)
 
-    def _get_smart_default_fields(self, model: str) -> Optional[List[str]]:
+    def _fields_get_for(
+        self, model: str, user_id: Optional[int] = None, attributes: Optional[List[str]] = None
+    ) -> Dict[str, Dict[str, Any]]:
+        """fields_get, computed for a specific user when one is given.
+
+        The per-user path matters: Odoo drops fields protected by ``groups=``
+        the user lacks from THEIR fields_get. Deriving smart defaults from the
+        admin connection instead would select protected fields and make the
+        subsequent pinned read fail with AccessError for normal users.
+        """
+        if user_id is not None:
+            kwargs: Dict[str, Any] = {}
+            if attributes:
+                kwargs["attributes"] = attributes
+            return self.connection.execute_kw_as_user(
+                user_id, model, "fields_get", [], kwargs
+            )
+        return self.connection.fields_get(model, attributes=attributes)
+
+    def _get_smart_default_fields(
+        self, model: str, user_id: Optional[int] = None
+    ) -> Optional[List[str]]:
         """Get smart default fields for a model using field importance scoring.
 
         Args:
             model: The Odoo model name
+            user_id: When set, score only the fields visible to this user
 
         Returns:
             List of field names to include by default, or None if unable to determine
         """
         try:
-            # Get all field definitions
-            fields_info = self.connection.fields_get(model)
+            # Get all field definitions (user-scoped when pinned/impersonating)
+            fields_info = self._fields_get_for(model, user_id)
 
             # Score all fields by importance
             field_scores = []
@@ -680,6 +718,118 @@ class OdooToolHandler:
             )
             return CallMethodResult(**result)
 
+        @self.app.tool(
+            title="Get Fields",
+            annotations=ToolAnnotations(
+                readOnlyHint=True,
+                destructiveHint=False,
+                idempotentHint=True,
+                openWorldHint=False,
+            ),
+        )
+        async def get_fields(
+            model: str,
+            attributes: Optional[List[str]] = None,
+            user_id: Optional[int] = None,
+            ctx: Optional[Context] = None,
+        ) -> FieldsResult:
+            """Get field definitions for a model (types, labels, required, relations).
+
+            The per-user metadata channel: in a pinned session (or with user_id)
+            the definitions are computed for that user, so fields protected by
+            groups= the user lacks are absent — what you see is exactly what a
+            subsequent read/create as that user may touch. Use this to discover
+            which fields exist, which are required, and what selection values
+            are allowed before proposing a create or update.
+
+            Args:
+                model: The Odoo model name (e.g. 'account.analytic.line')
+                attributes: Field attributes to return. Defaults to a compact
+                    set (string, type, required, readonly, relation, selection,
+                    help, store). Pass explicitly for others.
+                user_id: Optional Odoo user ID to compute the definitions for.
+                    Ignored (clamped) when the session is pinned.
+
+            Returns:
+                Field definitions keyed by field name.
+            """
+            result = await self._handle_get_fields_tool(
+                model, attributes, ctx, user_id=self._effective_user_id(user_id)
+            )
+            return FieldsResult(**result)
+
+        @self.app.tool(
+            title="Get Defaults",
+            annotations=ToolAnnotations(
+                readOnlyHint=True,
+                destructiveHint=False,
+                idempotentHint=True,
+                openWorldHint=False,
+            ),
+        )
+        async def get_defaults(
+            model: str,
+            fields: List[str],
+            user_id: Optional[int] = None,
+            ctx: Optional[Context] = None,
+        ) -> DefaultsResult:
+            """Get the default values a new record of this model would receive.
+
+            Runs default_get for the requested fields. In a pinned session (or
+            with user_id) defaults are computed as that user — e.g. a
+            timesheet's employee/date defaults come out prefilled for them.
+
+            Args:
+                model: The Odoo model name (e.g. 'account.analytic.line')
+                fields: Field names to fetch defaults for
+                user_id: Optional Odoo user ID to compute defaults for.
+                    Ignored (clamped) when the session is pinned.
+
+            Returns:
+                Default values keyed by field name (fields with no default
+                are absent).
+            """
+            result = await self._handle_get_defaults_tool(
+                model, fields, ctx, user_id=self._effective_user_id(user_id)
+            )
+            return DefaultsResult(**result)
+
+        @self.app.tool(
+            title="Check Access",
+            annotations=ToolAnnotations(
+                readOnlyHint=True,
+                destructiveHint=False,
+                idempotentHint=True,
+                openWorldHint=False,
+            ),
+        )
+        async def check_access(
+            model: str,
+            operation: str,
+            user_id: Optional[int] = None,
+            ctx: Optional[Context] = None,
+        ) -> AccessCheckResult:
+            """Check whether an operation on a model is permitted.
+
+            Runs check_access_rights(raise_exception=False). In a pinned
+            session (or with user_id) the check is for that user — use it to
+            confirm e.g. 'can this user create a timesheet?' BEFORE building a
+            proposal, instead of failing midway.
+
+            Args:
+                model: The Odoo model name (e.g. 'account.analytic.line')
+                operation: One of 'read', 'write', 'create', 'unlink'
+                user_id: Optional Odoo user ID to check for. Ignored (clamped)
+                    when the session is pinned.
+
+            Returns:
+                Whether the operation is allowed for the effective user.
+            """
+            result = await self._handle_check_access_tool(
+                model, operation, ctx, user_id=self._effective_user_id(user_id)
+            )
+            return AccessCheckResult(**result)
+
     async def _handle_search_tool(
         self,
         model: str,
@@ -801,7 +951,7 @@ class OdooToolHandler:
                 fields_to_fetch = parsed_fields
                 if parsed_fields is None:
                     # Use smart field selection to avoid serialization issues
-                    fields_to_fetch = self._get_smart_default_fields(model)
+                    fields_to_fetch = self._get_smart_default_fields(model, user_id=user_id)
                     await self._ctx_info(ctx, f"Using smart field defaults for {model}")
                     logger.debug(
                         f"Using smart defaults for {model} search: {len(fields_to_fetch) if fields_to_fetch else 'all'} fields"
@@ -872,7 +1022,7 @@ class OdooToolHandler:
 
                 if fields is None:
                     # Use smart field selection
-                    fields_to_fetch = self._get_smart_default_fields(model)
+                    fields_to_fetch = self._get_smart_default_fields(model, user_id=user_id)
                     use_smart_defaults = True
                     field_selection_method = "smart_defaults"
                     logger.debug(
@@ -905,7 +1055,7 @@ class OdooToolHandler:
                 metadata = None
                 if use_smart_defaults:
                     try:
-                        all_fields_info = self.connection.fields_get(model)
+                        all_fields_info = self._fields_get_for(model, user_id)
                         total_fields = len(all_fields_info)
                     except Exception:
                         pass
@@ -931,6 +1081,129 @@ class OdooToolHandler:
             logger.error(f"Error in get_record tool: {e}")
             sanitized_msg = ErrorSanitizer.sanitize_message(str(e))
             raise ValidationError(f"Failed to get record: {sanitized_msg}") from e
+
+    async def _handle_get_fields_tool(
+        self,
+        model: str,
+        attributes: Optional[List[str]],
+        ctx=None,
+        user_id: Optional[int] = None,
+    ) -> Dict[str, Any]:
+        """Handle get_fields tool request."""
+        try:
+            with perf_logger.track_operation("tool_get_fields", model=model):
+                self.access_controller.validate_model_access(model, "read")
+                await self._ctx_info(ctx, f"Getting field definitions for {model}...")
+
+                if not self.connection.is_authenticated:
+                    raise ValidationError("Not authenticated with Odoo")
+
+                attrs = attributes or DEFAULT_FIELD_ATTRIBUTES
+                fields_info = self._fields_get_for(model, user_id, attributes=attrs)
+                return {
+                    "model": model,
+                    "fields": fields_info,
+                    "total": len(fields_info),
+                    "user_scoped": user_id is not None,
+                }
+        except AccessControlError as e:
+            raise ValidationError(f"Access denied: {e}") from e
+        except OdooConnectionError as e:
+            raise ValidationError(f"Connection error: {e}") from e
+        except Exception as e:
+            logger.error(f"Error in get_fields tool: {e}")
+            sanitized_msg = ErrorSanitizer.sanitize_message(str(e))
+            raise ValidationError(f"Failed to get fields: {sanitized_msg}") from e
+
+    async def _handle_get_defaults_tool(
+        self,
+        model: str,
+        fields: List[str],
+        ctx=None,
+        user_id: Optional[int] = None,
+    ) -> Dict[str, Any]:
+        """Handle get_defaults tool request."""
+        try:
+            with perf_logger.track_operation("tool_get_defaults", model=model):
+                self.access_controller.validate_model_access(model, "read")
+                await self._ctx_info(ctx, f"Getting defaults for {model}...")
+
+                if not self.connection.is_authenticated:
+                    raise ValidationError("Not authenticated with Odoo")
+                if not fields or not isinstance(fields, list):
+                    raise ValidationError("fields must be a non-empty list of field names")
+
+                if user_id is not None:
+                    defaults = self.connection.execute_kw_as_user(
+                        user_id, model, "default_get", [fields], {}
+                    )
+                else:
+                    defaults = self.connection.execute_kw(model, "default_get", [fields], {})
+                return {
+                    "model": model,
+                    "defaults": defaults or {},
+                    "user_scoped": user_id is not None,
+                }
+        except ValidationError:
+            raise
+        except AccessControlError as e:
+            raise ValidationError(f"Access denied: {e}") from e
+        except OdooConnectionError as e:
+            raise ValidationError(f"Connection error: {e}") from e
+        except Exception as e:
+            logger.error(f"Error in get_defaults tool: {e}")
+            sanitized_msg = ErrorSanitizer.sanitize_message(str(e))
+            raise ValidationError(f"Failed to get defaults: {sanitized_msg}") from e
+
+    async def _handle_check_access_tool(
+        self,
+        model: str,
+        operation: str,
+        ctx=None,
+        user_id: Optional[int] = None,
+    ) -> Dict[str, Any]:
+        """Handle check_access tool request."""
+        try:
+            with perf_logger.track_operation("tool_check_access", model=model):
+                valid_ops = {"read", "write", "create", "unlink"}
+                if operation not in valid_ops:
+                    raise ValidationError(
+                        f"Invalid operation {operation!r}. Must be one of: "
+                        f"{', '.join(sorted(valid_ops))}"
+                    )
+                # Model must at least be MCP-visible; the actual permission
+                # answer comes from Odoo below.
+                self.access_controller.validate_model_access(model, "read")
+                await self._ctx_info(ctx, f"Checking {operation} access on {model}...")
+
+                if not self.connection.is_authenticated:
+                    raise ValidationError("Not authenticated with Odoo")
+
+                kwargs = {"raise_exception": False}
+                if user_id is not None:
+                    allowed = self.connection.execute_kw_as_user(
+                        user_id, model, "check_access_rights", [operation], kwargs
+                    )
+                else:
+                    allowed = self.connection.execute_kw(
+                        model, "check_access_rights", [operation], kwargs
+                    )
+                return {
+                    "model": model,
+                    "operation": operation,
+                    "allowed": bool(allowed),
+                    "user_scoped": user_id is not None,
+                }
+        except ValidationError:
+            raise
+        except AccessControlError as e:
+            raise ValidationError(f"Access denied: {e}") from e
+        except OdooConnectionError as e:
+            raise ValidationError(f"Connection error: {e}") from e
+        except Exception as e:
+            logger.error(f"Error in check_access tool: {e}")
+            sanitized_msg = ErrorSanitizer.sanitize_message(str(e))
+            raise ValidationError(f"Failed to check access: {sanitized_msg}") from e
 
     async def _handle_list_models_tool(self, ctx=None) -> Dict[str, Any]:
         """Handle list models tool request with permissions."""
