@@ -40,6 +40,14 @@ class OdooConfig:
     # YOLO mode configuration
     yolo_mode: str = "off"  # "off", "read", or "true"
 
+    # User pinning — when set, EVERY tool call is forced to run as this Odoo user
+    # via res.users.mcp_execute_as_user, and any user_id supplied by the model is
+    # ignored. Set per-request by claude-service (ODOO_ACT_AS_UID) for end-user
+    # chat sessions so record rules + field security are enforced for the sender,
+    # regardless of the admin service account the connection authenticates as.
+    # None means "not pinned" (the trusted-automation / admin default).
+    act_as_uid: Optional[int] = None
+
     def __post_init__(self):
         """Validate configuration after initialization."""
         # Validate URL
@@ -117,6 +125,11 @@ class OdooConfig:
     def is_yolo_enabled(self) -> bool:
         """Check if any YOLO mode is active."""
         return self.yolo_mode != "off"
+
+    @property
+    def is_user_pinned(self) -> bool:
+        """Whether every call is forced to run as a specific end-user."""
+        return self.act_as_uid is not None
 
     @property
     def is_write_allowed(self) -> bool:
@@ -204,6 +217,17 @@ def load_config(env_file: Optional[Path] = None) -> OdooConfig:
         except ValueError:
             raise ValueError(f"{key} must be a valid integer") from None
 
+    # Parse the pinned end-user id. Robust by design: this may be delivered
+    # through config-file interpolation, so an empty string, an un-substituted
+    # "${...}" literal, or any non-positive/non-integer value all mean "not
+    # pinned" rather than an error — the pinned path must never fail open.
+    def get_act_as_uid() -> Optional[int]:
+        raw = (os.getenv("ODOO_ACT_AS_UID") or "").strip()
+        if not raw or not raw.isdigit():
+            return None
+        value = int(raw)
+        return value if value > 0 else None
+
     # Helper function to parse YOLO mode
     def get_yolo_mode() -> str:
         yolo_env = os.getenv("ODOO_YOLO", "off").strip().lower()
@@ -234,6 +258,7 @@ def load_config(env_file: Optional[Path] = None) -> OdooConfig:
         port=get_int_env("ODOO_MCP_PORT", 8000),
         locale=os.getenv("ODOO_LOCALE", "").strip() or None,
         yolo_mode=get_yolo_mode(),
+        act_as_uid=get_act_as_uid(),
     )
 
     return config

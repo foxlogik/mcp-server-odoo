@@ -88,6 +88,25 @@ class OdooToolHandler:
         # Register tools
         self._register_tools()
 
+    def _effective_user_id(self, user_id: Optional[int]) -> Optional[int]:
+        """Resolve the user id every tool call actually executes as.
+
+        When the session is pinned to an end-user (ODOO_ACT_AS_UID), that id is
+        authoritative and CLAMPS the call: any user_id the model supplied is
+        ignored, so prompt-injection cannot escalate to another user or to the
+        admin service account. When not pinned, the model-supplied user_id (if
+        any) is used unchanged — the trusted-automation default.
+        """
+        pinned = self.config.act_as_uid
+        if pinned is not None:
+            if user_id is not None and user_id != pinned:
+                logger.warning(
+                    "MCP session pinned to uid=%s; ignoring model-supplied user_id=%s",
+                    pinned, user_id,
+                )
+            return pinned
+        return user_id
+
     def _format_datetime(self, value: str) -> str:
         """Format datetime values to ISO 8601 with timezone."""
         if not value or not isinstance(value, str):
@@ -414,7 +433,8 @@ class OdooToolHandler:
                 Search results with records, total count, and pagination info
             """
             result = await self._handle_search_tool(
-                model, domain, fields, limit, offset, order, ctx, user_id=user_id
+                model, domain, fields, limit, offset, order, ctx,
+                user_id=self._effective_user_id(user_id),
             )
             return SearchResult(**result)
 
@@ -470,7 +490,9 @@ class OdooToolHandler:
                 Record data with requested fields. When using smart defaults,
                 includes metadata with field statistics.
             """
-            return await self._handle_get_record_tool(model, record_id, fields, ctx, user_id=user_id)
+            return await self._handle_get_record_tool(
+                model, record_id, fields, ctx, user_id=self._effective_user_id(user_id)
+            )
 
         @self.app.tool(
             title="List Models",
@@ -540,7 +562,9 @@ class OdooToolHandler:
             Returns:
                 Created record details with ID, URL, and confirmation.
             """
-            result = await self._handle_create_record_tool(model, values, ctx, user_id=user_id)
+            result = await self._handle_create_record_tool(
+                model, values, ctx, user_id=self._effective_user_id(user_id)
+            )
             return CreateResult(**result)
 
         @self.app.tool(
@@ -572,7 +596,9 @@ class OdooToolHandler:
             Returns:
                 Updated record details with confirmation.
             """
-            result = await self._handle_update_record_tool(model, record_id, values, ctx, user_id=user_id)
+            result = await self._handle_update_record_tool(
+                model, record_id, values, ctx, user_id=self._effective_user_id(user_id)
+            )
             return UpdateResult(**result)
 
         @self.app.tool(
@@ -602,7 +628,9 @@ class OdooToolHandler:
             Returns:
                 Deletion confirmation with the deleted record's name and ID.
             """
-            result = await self._handle_delete_record_tool(model, record_id, ctx, user_id=user_id)
+            result = await self._handle_delete_record_tool(
+                model, record_id, ctx, user_id=self._effective_user_id(user_id)
+            )
             return DeleteResult(**result)
 
         @self.app.tool(
@@ -647,7 +675,8 @@ class OdooToolHandler:
                 The raw return value of the method, wrapped with success/message.
             """
             result = await self._handle_call_method_tool(
-                model, method, args, kwargs, ctx, user_id=user_id
+                model, method, args, kwargs, ctx,
+                user_id=self._effective_user_id(user_id),
             )
             return CallMethodResult(**result)
 
