@@ -427,7 +427,7 @@ class OdooToolHandler:
                 user_id: Optional Odoo user ID. When provided the search runs
                     under that user's security context (record rules and access
                     rights are enforced for that user). Requires the
-                    foxlogik_claude_automation module to be installed.
+                    foxlogik_mcp_proxy module to be installed.
 
             Returns:
                 Search results with records, total count, and pagination info
@@ -468,7 +468,7 @@ class OdooToolHandler:
                     - ["__all__"]: Returns ALL fields (warning: can be very large)
                 user_id: Optional Odoo user ID. When provided the read runs
                     under that user's security context. Requires the
-                    foxlogik_claude_automation module to be installed.
+                    foxlogik_mcp_proxy module to be installed.
 
             Workflow for field discovery:
             1. To see all available fields for a model, use the resource:
@@ -557,7 +557,7 @@ class OdooToolHandler:
                 values: Field values for the new record
                 user_id: Optional Odoo user ID. When provided the create runs
                     under that user's security context. Requires the
-                    foxlogik_claude_automation module to be installed.
+                    foxlogik_mcp_proxy module to be installed.
 
             Returns:
                 Created record details with ID, URL, and confirmation.
@@ -591,7 +591,7 @@ class OdooToolHandler:
                 values: Field values to update
                 user_id: Optional Odoo user ID. When provided the write runs
                     under that user's security context. Requires the
-                    foxlogik_claude_automation module to be installed.
+                    foxlogik_mcp_proxy module to be installed.
 
             Returns:
                 Updated record details with confirmation.
@@ -623,7 +623,7 @@ class OdooToolHandler:
                 record_id: The record ID to delete
                 user_id: Optional Odoo user ID. When provided the delete runs
                     under that user's security context. Requires the
-                    foxlogik_claude_automation module to be installed.
+                    foxlogik_mcp_proxy module to be installed.
 
             Returns:
                 Deletion confirmation with the deleted record's name and ID.
@@ -669,7 +669,7 @@ class OdooToolHandler:
                     dict. Defaults to {}.
                 user_id: Optional Odoo user ID. When provided the call runs under
                     that user's security context. Requires the
-                    foxlogik_claude_automation / foxlogik_mcp_proxy module.
+                    foxlogik_mcp_proxy module.
 
             Returns:
                 The raw return value of the method, wrapped with success/message.
@@ -961,14 +961,29 @@ class OdooToolHandler:
                             ),
                         ]
 
-                        # Query models from database
-                        model_records = self.connection.search_read(
-                            "ir.model",
-                            domain,
-                            ["model", "name"],
-                            order="name ASC",
-                            limit=200,  # Reasonable limit for practical use
-                        )
+                        # Query models from database. In a pinned session, run
+                        # as the pinned user so model-name disclosure respects
+                        # their access rights instead of the admin account's.
+                        if self.config.is_user_pinned:
+                            model_records = self.connection.execute_kw_as_user(
+                                self.config.act_as_uid,
+                                "ir.model",
+                                "search_read",
+                                [domain],
+                                {
+                                    "fields": ["model", "name"],
+                                    "order": "name ASC",
+                                    "limit": 200,
+                                },
+                            )
+                        else:
+                            model_records = self.connection.search_read(
+                                "ir.model",
+                                domain,
+                                ["model", "name"],
+                                order="name ASC",
+                                limit=200,  # Reasonable limit for practical use
+                            )
 
                         # Prepare response with YOLO mode metadata
                         mode_desc = (

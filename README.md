@@ -515,7 +515,9 @@ Search for records in any Odoo model with filters.
 }
 ```
 
-`user_id` is optional. When set, the search runs under that Odoo user's security context — record rules and access rights are enforced for that user. Requires the `foxlogik_claude_automation` module.
+`user_id` is optional. When set, the search runs under that Odoo user's security context — record rules and access rights are enforced for that user. Requires the `foxlogik_mcp_proxy` module.
+
+**Session pinning (`ODOO_ACT_AS_UID`)**: when this environment variable is set to a positive user id, EVERY tool call is forced to run as that user and any model-supplied `user_id` is ignored. Set per-process by claude-service for end-user chat sessions. In pinned sessions the `odoo://` resources are not registered (they read as admin and would bypass the pin) — use the tools instead. A non-empty, non-positive-integer value (other than an un-substituted `${ODOO_ACT_AS_UID}` literal) aborts startup rather than silently running unpinned.
 
 **Field Selection Options:**
 - Omit `fields` or set to `null`: Returns smart selection of common fields

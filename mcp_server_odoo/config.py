@@ -4,12 +4,15 @@ This module handles loading and validation of environment variables
 for connecting to Odoo via XML-RPC.
 """
 
+import logging
 import os
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, Literal, Optional
 
 from dotenv import load_dotenv
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -217,16 +220,33 @@ def load_config(env_file: Optional[Path] = None) -> OdooConfig:
         except ValueError:
             raise ValueError(f"{key} must be a valid integer") from None
 
-    # Parse the pinned end-user id. Robust by design: this may be delivered
-    # through config-file interpolation, so an empty string, an un-substituted
-    # "${...}" literal, or any non-positive/non-integer value all mean "not
-    # pinned" rather than an error — the pinned path must never fail open.
+    # Parse the pinned end-user id. Exactly two values mean "not pinned":
+    #   - unset / empty string — the documented signal claude-service sends for
+    #     trusted-automation runs (it always sets the var, empty when unpinned);
+    #   - an un-substituted "${...}" literal — the spawning environment never
+    #     defined the var at all (interactive session, no pinning intended).
+    # Anything else that is not a positive integer is a malformed pinning
+    # attempt and must FAIL CLOSED: raising here aborts server startup, so a
+    # session that was meant to be pinned can never silently run as admin.
     def get_act_as_uid() -> Optional[int]:
         raw = (os.getenv("ODOO_ACT_AS_UID") or "").strip()
-        if not raw or not raw.isdigit():
+        if not raw:
             return None
-        value = int(raw)
-        return value if value > 0 else None
+        if raw.startswith("${") and raw.endswith("}"):
+            logger.warning(
+                "ODOO_ACT_AS_UID was not substituted (%r) — running unpinned. "
+                "If this session was meant to be pinned to an end user, the "
+                "spawning environment failed to set the variable.",
+                raw,
+            )
+            return None
+        if not raw.isdigit() or int(raw) <= 0:
+            raise ValueError(
+                f"ODOO_ACT_AS_UID must be a positive integer user id, got {raw!r}. "
+                "Refusing to start unpinned: a malformed pin must never fall back "
+                "to the admin service account."
+            )
+        return int(raw)
 
     # Helper function to parse YOLO mode
     def get_yolo_mode() -> str:
