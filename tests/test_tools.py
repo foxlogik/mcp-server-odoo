@@ -84,6 +84,9 @@ class TestOdooToolHandler:
             "delete_record",
             "list_resource_templates",
             "call_method",
+            "get_fields",
+            "get_defaults",
+            "check_access",
         }
         assert set(mock_app._tools.keys()) == expected_tools
 

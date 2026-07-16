@@ -4,12 +4,15 @@ This module handles loading and validation of environment variables
 for connecting to Odoo via XML-RPC.
 """
 
+import logging
 import os
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, Literal, Optional
 
 from dotenv import load_dotenv
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -39,6 +42,14 @@ class OdooConfig:
 
     # YOLO mode configuration
     yolo_mode: str = "off"  # "off", "read", or "true"
+
+    # User pinning — when set, EVERY tool call is forced to run as this Odoo user
+    # via res.users.mcp_execute_as_user, and any user_id supplied by the model is
+    # ignored. Set per-request by claude-service (ODOO_ACT_AS_UID) for end-user
+    # chat sessions so record rules + field security are enforced for the sender,
+    # regardless of the admin service account the connection authenticates as.
+    # None means "not pinned" (the trusted-automation / admin default).
+    act_as_uid: Optional[int] = None
 
     def __post_init__(self):
         """Validate configuration after initialization."""
@@ -117,6 +128,11 @@ class OdooConfig:
     def is_yolo_enabled(self) -> bool:
         """Check if any YOLO mode is active."""
         return self.yolo_mode != "off"
+
+    @property
+    def is_user_pinned(self) -> bool:
+        """Whether every call is forced to run as a specific end-user."""
+        return self.act_as_uid is not None
 
     @property
     def is_write_allowed(self) -> bool:
@@ -204,6 +220,34 @@ def load_config(env_file: Optional[Path] = None) -> OdooConfig:
         except ValueError:
             raise ValueError(f"{key} must be a valid integer") from None
 
+    # Parse the pinned end-user id. Exactly two values mean "not pinned":
+    #   - unset / empty string — the documented signal claude-service sends for
+    #     trusted-automation runs (it always sets the var, empty when unpinned);
+    #   - an un-substituted "${...}" literal — the spawning environment never
+    #     defined the var at all (interactive session, no pinning intended).
+    # Anything else that is not a positive integer is a malformed pinning
+    # attempt and must FAIL CLOSED: raising here aborts server startup, so a
+    # session that was meant to be pinned can never silently run as admin.
+    def get_act_as_uid() -> Optional[int]:
+        raw = (os.getenv("ODOO_ACT_AS_UID") or "").strip()
+        if not raw:
+            return None
+        if raw.startswith("${") and raw.endswith("}"):
+            logger.warning(
+                "ODOO_ACT_AS_UID was not substituted (%r) — running unpinned. "
+                "If this session was meant to be pinned to an end user, the "
+                "spawning environment failed to set the variable.",
+                raw,
+            )
+            return None
+        if not raw.isdigit() or int(raw) <= 0:
+            raise ValueError(
+                f"ODOO_ACT_AS_UID must be a positive integer user id, got {raw!r}. "
+                "Refusing to start unpinned: a malformed pin must never fall back "
+                "to the admin service account."
+            )
+        return int(raw)
+
     # Helper function to parse YOLO mode
     def get_yolo_mode() -> str:
         yolo_env = os.getenv("ODOO_YOLO", "off").strip().lower()
@@ -234,6 +278,7 @@ def load_config(env_file: Optional[Path] = None) -> OdooConfig:
         port=get_int_env("ODOO_MCP_PORT", 8000),
         locale=os.getenv("ODOO_LOCALE", "").strip() or None,
         yolo_mode=get_yolo_mode(),
+        act_as_uid=get_act_as_uid(),
     )
 
     return config

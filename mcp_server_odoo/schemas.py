@@ -158,6 +158,54 @@ class DeleteResult(BaseModel):
     message: str = Field(description="Human-readable success message")
 
 
+# --- Get Fields ---
+
+
+class FieldsResult(BaseModel):
+    """Result of retrieving field definitions via the get_fields tool."""
+
+    model: str = Field(description="Odoo model name the fields belong to")
+    fields: Dict[str, Dict[str, Any]] = Field(
+        description="Field definitions keyed by field name (fields_get output)"
+    )
+    total: int = Field(description="Number of fields returned")
+    user_scoped: bool = Field(
+        description=(
+            "True when the definitions were computed for a specific user — "
+            "fields protected by groups= that user lacks are absent"
+        )
+    )
+
+
+# --- Get Defaults ---
+
+
+class DefaultsResult(BaseModel):
+    """Result of retrieving default field values via the get_defaults tool."""
+
+    model: str = Field(description="Odoo model name")
+    defaults: Dict[str, Any] = Field(
+        description="Default values keyed by field name (default_get output)"
+    )
+    user_scoped: bool = Field(
+        description="True when defaults were computed for a specific user"
+    )
+
+
+# --- Check Access ---
+
+
+class AccessCheckResult(BaseModel):
+    """Result of checking a user's access rights on a model."""
+
+    model: str = Field(description="Odoo model name that was checked")
+    operation: str = Field(description="Operation checked: read, write, create or unlink")
+    allowed: bool = Field(description="Whether the operation is permitted")
+    user_scoped: bool = Field(
+        description="True when checked for a specific user (pinned or user_id)"
+    )
+
+
 # --- Call Method ---
 
 

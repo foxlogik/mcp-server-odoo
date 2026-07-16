@@ -930,7 +930,7 @@ class OdooConnection:
         """Execute a model method as a specific Odoo user.
 
         Delegates to ``res.users.mcp_execute_as_user`` installed by the
-        foxlogik_claude_automation module.  The admin session is used for the
+        foxlogik_mcp_proxy module.  The admin session is used for the
         outer XML-RPC call; Odoo switches the execution environment to
         ``env(user=user_id)`` server-side, so record rules, field-level access
         and group restrictions all apply for the target user.

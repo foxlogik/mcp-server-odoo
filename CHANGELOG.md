@@ -8,8 +8,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Per-user metadata tools**: `get_fields` (fields_get — types, labels, required, relations, selection values), `get_defaults` (default_get) and `check_access` (check_access_rights, non-raising). In pinned sessions (or with `user_id`) they compute as that user, so `groups=`-protected fields are absent and access answers are real. These are the discovery channels for pinned sessions — normal users cannot read `ir.model` / `ir.model.fields` raw (admin-only ACL in Odoo core), and resources are unregistered when pinned.
+- **Act-as-uid session pinning** (`ODOO_ACT_AS_UID`): when set to a positive user id, every tool call is clamped to that user via `res.users.mcp_execute_as_user` — a model-supplied `user_id` is ignored (logged). Startup logs `act-as-uid pinning ACTIVE` so deployments are verifiable; version bumped to 0.6.0 for the same reason.
+
+### Fixed
+- **Smart default fields in pinned sessions**: field selection for `search_records`/`get_record` derived from the admin connection's `fields_get`, so it could pick `groups=`-protected fields the pinned user cannot read — the explicit read then raised AccessError and failed the whole call. Selection now uses the effective user's `fields_get`, dropping protected fields automatically.
+
+### Security
+- **Pinned sessions skip resource registration**: `odoo://` resources read through the raw admin connection, which would bypass act-as-uid pinning — they are no longer registered when the session is pinned (fail closed; tools cover the same reads under the pinned user).
+- **Malformed `ODOO_ACT_AS_UID` fails closed**: any non-empty value that is not a positive integer (or an un-substituted `${ODOO_ACT_AS_UID}` literal, which means "not pinned") aborts startup instead of silently falling back to the admin service account.
+- **Pinned model-name listing**: `list_models` (YOLO mode) and model-name autocomplete query `ir.model` as the pinned user instead of admin.
 - **`call_method` tool**: invoke an allowlisted bespoke model method (not just CRUD). Methods must be listed in `METHOD_CALL_ALLOWLIST` (`tools.py`) — a deliberately tight gate since the tool can run arbitrary model methods. Initially exposes the `bpm.process` BPMN-builder helpers (`get_builder_reference`, `validate_bpmn_xml`, `create_draft_process_from_spec`). Accepts `args`/`kwargs` as native values or JSON strings, supports the optional `user_id` impersonation, and enforces model access control (read for inspectors, create for the builder).
-- **Per-user security context**: All data tools (`search_records`, `get_record`, `create_record`, `update_record`, `delete_record`) now accept an optional `user_id` parameter. When set, the operation runs under that user's Odoo security context — record rules and access rights are enforced for that user rather than the service account. Requires the `foxlogik_claude_automation` module.
+- **Per-user security context**: All data tools (`search_records`, `get_record`, `create_record`, `update_record`, `delete_record`) now accept an optional `user_id` parameter. When set, the operation runs under that user's Odoo security context — record rules and access rights are enforced for that user rather than the service account. Requires the `foxlogik_mcp_proxy` module.
 
 ## [0.5.0] - 2026-02-28
 

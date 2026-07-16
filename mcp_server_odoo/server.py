@@ -26,7 +26,7 @@ from .tools import register_tools
 logger = get_logger(__name__)
 
 # Server version
-SERVER_VERSION = "0.5.0"
+SERVER_VERSION = "0.6.0"
 
 
 class OdooMCPServer:
@@ -127,6 +127,16 @@ class OdooMCPServer:
 
                 logger.info(f"Successfully connected to Odoo at {self.config.url}")
 
+                # Deployment-verifiable pinning banner: operators grep for this
+                # line to confirm the running build enforces act-as-uid pinning.
+                if self.config.is_user_pinned:
+                    logger.info(
+                        "act-as-uid pinning ACTIVE: all tool calls execute as "
+                        "uid=%s (server v%s)",
+                        self.config.act_as_uid,
+                        SERVER_VERSION,
+                    )
+
                 # Initialize access controller (pass resolved DB for session auth)
                 self.access_controller = AccessController(
                     self.config, database=self.connection.database
@@ -155,7 +165,21 @@ class OdooMCPServer:
                 self.tool_handler = None
 
     def _register_resources(self):
-        """Register resource handlers after connection is established."""
+        """Register resource handlers after connection is established.
+
+        Resources (odoo://... URIs) read through the raw admin connection and
+        have no per-user execution path, so in a pinned session they would
+        bypass the act-as-uid enforcement the tools apply. Fail closed: when
+        the session is pinned, don't register them at all — the tools expose
+        the same reads under the pinned user's security context.
+        """
+        if self.config.is_user_pinned:
+            logger.info(
+                "act-as-uid pinning: skipping MCP resource registration "
+                "(resources would read as admin and bypass uid=%s pinning)",
+                self.config.act_as_uid,
+            )
+            return
         if self.connection and self.access_controller:
             self.resource_handler = register_resources(
                 self.app, self.connection, self.access_controller, self.config
@@ -253,9 +277,20 @@ class OdooMCPServer:
             models = self.access_controller.get_enabled_models()
             if models:
                 return [m["model"] for m in models]
-            # YOLO mode returns [] meaning "all allowed" — query ir.model directly
+            # YOLO mode returns [] meaning "all allowed" — query ir.model directly.
+            # In a pinned session, run the query as the pinned user so even
+            # model-name disclosure respects their access rights.
             if self.connection and self.connection.is_authenticated:
-                records = self.connection.search_read("ir.model", [], ["model"], limit=200)
+                if self.config.is_user_pinned:
+                    records = self.connection.execute_kw_as_user(
+                        self.config.act_as_uid,
+                        "ir.model",
+                        "search_read",
+                        [[]],
+                        {"fields": ["model"], "limit": 200},
+                    )
+                else:
+                    records = self.connection.search_read("ir.model", [], ["model"], limit=200)
                 return [r["model"] for r in records]
             return []
         except Exception as e:
