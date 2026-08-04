@@ -17,6 +17,9 @@ class TestFixesIntegration:
         connection = Mock()
         access_controller = Mock()
         config = Mock()
+        # Unpinned by default: a bare Mock would make config.act_as_uid a truthy
+        # Mock and silently route every call through user impersonation.
+        config.act_as_uid = None
         config.default_limit = 10
         config.max_limit = 100
         config.max_smart_fields = 30

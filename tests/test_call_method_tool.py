@@ -32,6 +32,9 @@ class TestCallMethodTool:
     @pytest.fixture
     def mock_config(self):
         config = Mock()
+        # Unpinned by default: a bare Mock would make config.act_as_uid a truthy
+        # Mock and silently route every call through user impersonation.
+        config.act_as_uid = None
         config.url = "http://localhost:8069"
         return config
 

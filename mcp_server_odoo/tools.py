@@ -651,6 +651,26 @@ class OdooToolHandler:
             )
             return CallMethodResult(**result)
 
+    def _effective_user_id(self, user_id: Optional[int]) -> Optional[int]:
+        """Resolve which Odoo user a record operation runs as.
+
+        An explicit ``user_id`` argument wins; otherwise the session-wide pin from
+        ODOO_ACT_AS_UID applies. None means "run as the connection account", which
+        is correct for trusted automation with no end user behind it.
+
+        Applied at the head of each record-CRUD handler rather than at the twelve
+        individual call sites, so a new branch inside a handler cannot quietly miss
+        the pin.
+
+        Schema introspection deliberately does NOT route through here:
+        ``connection.fields_get()`` stays on the connection account, because
+        ir.model.fields read is reserved for base.group_erp_manager and pinning it
+        to an ordinary employee would break field discovery for every such user.
+        """
+        if user_id is not None:
+            return user_id
+        return self.config.act_as_uid
+
     async def _handle_search_tool(
         self,
         model: str,
@@ -663,6 +683,8 @@ class OdooToolHandler:
         user_id: Optional[int] = None,
     ) -> Dict[str, Any]:
         """Handle search tool request."""
+        # Session-wide impersonation pin; an explicit user_id argument wins.
+        user_id = self._effective_user_id(user_id)
         try:
             with perf_logger.track_operation("tool_search", model=model):
                 # Check model access
@@ -825,6 +847,8 @@ class OdooToolHandler:
         user_id: Optional[int] = None,
     ) -> RecordResult:
         """Handle get record tool request."""
+        # Session-wide impersonation pin; an explicit user_id argument wins.
+        user_id = self._effective_user_id(user_id)
         try:
             with perf_logger.track_operation("tool_get_record", model=model):
                 # Check model access
@@ -1119,6 +1143,8 @@ class OdooToolHandler:
         user_id: Optional[int] = None,
     ) -> Dict[str, Any]:
         """Handle create record tool request."""
+        # Session-wide impersonation pin; an explicit user_id argument wins.
+        user_id = self._effective_user_id(user_id)
         try:
             with perf_logger.track_operation("tool_create_record", model=model):
                 # Check model access
@@ -1190,6 +1216,8 @@ class OdooToolHandler:
         user_id: Optional[int] = None,
     ) -> Dict[str, Any]:
         """Handle update record tool request."""
+        # Session-wide impersonation pin; an explicit user_id argument wins.
+        user_id = self._effective_user_id(user_id)
         try:
             with perf_logger.track_operation("tool_update_record", model=model):
                 # Check model access
@@ -1272,6 +1300,8 @@ class OdooToolHandler:
         user_id: Optional[int] = None,
     ) -> Dict[str, Any]:
         """Handle delete record tool request."""
+        # Session-wide impersonation pin; an explicit user_id argument wins.
+        user_id = self._effective_user_id(user_id)
         try:
             with perf_logger.track_operation("tool_delete_record", model=model):
                 # Check model access
@@ -1353,6 +1383,8 @@ class OdooToolHandler:
         user_id: Optional[int] = None,
     ) -> Dict[str, Any]:
         """Handle call_method tool request (allowlisted model methods only)."""
+        # Session-wide impersonation pin; an explicit user_id argument wins.
+        user_id = self._effective_user_id(user_id)
         try:
             with perf_logger.track_operation("tool_call_method", model=model):
                 # Allowlist gate — reject any non-vetted (model, method) before Odoo.

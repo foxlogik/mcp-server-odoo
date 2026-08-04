@@ -302,8 +302,31 @@ The server requires the following environment variables:
 | `ODOO_DB` | No | Database name (auto-detected if not set) | `mycompany` |
 | `ODOO_LOCALE` | No | Language/locale for Odoo responses | `es_ES`, `fr_FR`, `de_DE` |
 | `ODOO_YOLO` | No | YOLO mode - bypasses MCP security (⚠️ DEV ONLY) | `off`, `read`, `true` |
+| `ODOO_ACT_AS_UID` | No | Run every record operation as this Odoo user | `42` (empty = unpinned) |
 
 *Either `ODOO_API_KEY` or both `ODOO_USER` and `ODOO_PASSWORD` are required.
+
+### Impersonation: `ODOO_ACT_AS_UID` vs the `user_id` argument
+
+Record operations can run under a specific user's security context, so Odoo's record rules
+and field-level access apply to that user rather than to the connection account. There are
+two ways to set it, and the resolution order is:
+
+1. An explicit `user_id` argument on the tool call — always wins.
+2. `ODOO_ACT_AS_UID` — the session-wide pin.
+3. Neither — the operation runs as the connection account (`ODOO_USER`).
+
+Prefer the env var whenever the *caller* knows the end user. Leaving impersonation to the
+per-call argument alone means a session that never passes it runs everything as the
+connection account, silently and with no log line — that is a privilege escalation, not a
+default. The env var takes the decision out of the model's hands.
+
+Leave it empty for trusted automation that genuinely has no end user behind it. An invalid
+value raises at startup rather than falling back to unpinned.
+
+**Field metadata is never pinned.** `fields_get` stays on the connection account, because
+`ir.model.fields` read is reserved for `base.group_erp_manager` in stock Odoo — pinning it
+to an ordinary employee would break field discovery for that user.
 
 **Notes:**
 - If database listing is restricted on your server, you must specify `ODOO_DB`

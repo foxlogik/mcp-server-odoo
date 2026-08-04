@@ -10,6 +10,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - **`call_method` tool**: invoke an allowlisted bespoke model method (not just CRUD). Methods must be listed in `METHOD_CALL_ALLOWLIST` (`tools.py`) — a deliberately tight gate since the tool can run arbitrary model methods. Initially exposes the `bpm.process` BPMN-builder helpers (`get_builder_reference`, `validate_bpmn_xml`, `create_draft_process_from_spec`). Accepts `args`/`kwargs` as native values or JSON strings, supports the optional `user_id` impersonation, and enforces model access control (read for inspectors, create for the builder).
 - **Per-user security context**: All data tools (`search_records`, `get_record`, `create_record`, `update_record`, `delete_record`) now accept an optional `user_id` parameter. When set, the operation runs under that user's Odoo security context — record rules and access rights are enforced for that user rather than the service account. Requires the `foxlogik_claude_automation` module.
+- **`ODOO_ACT_AS_UID` — session-wide impersonation pin.** Sets the user every record operation runs as, without the calling model having to pass `user_id`. An explicit `user_id` argument still wins; unset or empty means unpinned (the connection account), which is correct for trusted automation with no end user behind it. A non-numeric or non-positive value raises at startup rather than silently falling back.
+
+  Closes a security gap: `user_id` was optional with no default, so a session that simply never passed it ran **everything** as the connection account — silently, with no log line. `claude-service` already exported `ODOO_ACT_AS_UID` (`stream_runner.run_streaming`) and the `.mcp-*.json` configs already passed it through, but no build of this server read it, and the system prompt never told the model to send `user_id`. The pin was inert end to end.
+
+  Field metadata is deliberately **not** pinned: `connection.fields_get()` stays on the connection account, because `ir.model.fields` read is reserved for `base.group_erp_manager`. Routing it through an ordinary employee would break field discovery — including steps 2–3 of the MCP Model Discovery Protocol — for every non-admin user.
+
+  **Deployment note:** this only takes effect where the server process actually receives the variable. Verify each `.mcp-*.json` passes `"ODOO_ACT_AS_UID": "${ODOO_ACT_AS_UID}"` in its `env` block, and that the deployed build includes this change.
 
 ## [0.5.0] - 2026-02-28
 

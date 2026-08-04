@@ -40,6 +40,22 @@ class OdooConfig:
     # YOLO mode configuration
     yolo_mode: str = "off"  # "off", "read", or "true"
 
+    # Session-wide impersonation pin (ODOO_ACT_AS_UID).
+    #
+    # When set, record CRUD runs under this Odoo user's security context instead
+    # of the connection account's, exactly as if every tool call had passed
+    # user_id explicitly. An explicit user_id argument still wins.
+    #
+    # This exists because the caller (claude-service) knows the end user, but the
+    # model does not: leaving impersonation to an optional per-call argument means
+    # a session that simply never passes it runs everything as the connection
+    # account, silently and with no log line. Pinning belongs to the transport,
+    # not to the model's discretion.
+    #
+    # None = unpinned (connection account), which is correct for trusted
+    # automation runs that have no end user behind them.
+    act_as_uid: Optional[int] = None
+
     def __post_init__(self):
         """Validate configuration after initialization."""
         # Validate URL
@@ -49,6 +65,15 @@ class OdooConfig:
         # Ensure URL format
         if not self.url.startswith(("http://", "https://")):
             raise ValueError("ODOO_URL must start with http:// or https://")
+
+        # Validate the impersonation pin. A bad value must fail loudly at startup:
+        # falling back to "unpinned" would silently promote the whole session to
+        # the connection account, which is the exact failure this field prevents.
+        if self.act_as_uid is not None and self.act_as_uid <= 0:
+            raise ValueError(
+                f"ODOO_ACT_AS_UID must be a positive integer, got {self.act_as_uid}. "
+                "Leave it empty for an unpinned (connection-account) session."
+            )
 
         # Validate YOLO mode
         valid_yolo_modes = {"off", "read", "true"}
@@ -218,6 +243,25 @@ def load_config(env_file: Optional[Path] = None) -> OdooConfig:
             # Invalid value - will be caught by validation
             return yolo_env
 
+    # Helper function to parse the impersonation pin.
+    #
+    # claude-service always exports ODOO_ACT_AS_UID, using the empty string to mean
+    # "not pinned" (see stream_runner.run_streaming), so unset and empty must both
+    # read as None rather than as an error. A non-numeric value is a wiring mistake
+    # and is raised — silently ignoring it would run the session as the connection
+    # account while the operator believed it was pinned.
+    def get_act_as_uid() -> Optional[int]:
+        raw = os.getenv("ODOO_ACT_AS_UID", "").strip()
+        if not raw:
+            return None
+        try:
+            return int(raw)
+        except ValueError:
+            raise ValueError(
+                f"ODOO_ACT_AS_UID must be a valid integer, got {raw!r}. "
+                "Leave it empty for an unpinned (connection-account) session."
+            ) from None
+
     # Create configuration
     config = OdooConfig(
         url=os.getenv("ODOO_URL", "").strip(),
@@ -234,6 +278,7 @@ def load_config(env_file: Optional[Path] = None) -> OdooConfig:
         port=get_int_env("ODOO_MCP_PORT", 8000),
         locale=os.getenv("ODOO_LOCALE", "").strip() or None,
         yolo_mode=get_yolo_mode(),
+        act_as_uid=get_act_as_uid(),
     )
 
     return config

@@ -41,6 +41,9 @@ class TestWriteTools:
     def mock_config(self):
         """Create mock OdooConfig."""
         config = Mock()
+        # Unpinned by default: a bare Mock would make config.act_as_uid a truthy
+        # Mock and silently route every call through user impersonation.
+        config.act_as_uid = None
         config.default_limit = 10
         config.max_limit = 100
         config.url = "http://localhost:8069"
