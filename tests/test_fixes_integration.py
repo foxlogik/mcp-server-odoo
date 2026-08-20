@@ -63,6 +63,10 @@ class TestFixesIntegration:
             "id": {"type": "integer"},
             "name": {"type": "char", "required": True},
             "email": {"type": "char", "store": True, "searchable": True},
+            # Real res.partner field, searched on in Test 3 below. Field names in
+            # a domain are validated against this schema before the RPC, so the
+            # stub has to carry the fields the test searches on.
+            "is_company": {"type": "boolean", "store": True},
             "create_date": {"type": "datetime", "store": True},
             "write_date": {"type": "datetime"},  # Should be excluded
             "image_1920": {"type": "binary"},  # Should be excluded
