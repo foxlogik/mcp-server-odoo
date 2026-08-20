@@ -1,0 +1,3514 @@
+{
+ "window_days": 20,
+ "cases": [
+  {
+   "tool": "search_records",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "model": "foxlogik.questionnaire",
+    "domain": [],
+    "fields": [
+     "id",
+     "name"
+    ],
+    "limit": 10
+   },
+   "error_class": "invalid-field",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: Invalid field 'name' in request",
+   "count": 6
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "model": "foxlogik.questionnaire",
+    "fields": [
+     "id",
+     "name"
+    ],
+    "limit": 20
+   },
+   "error_class": "invalid-field",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: Invalid field 'name' in request",
+   "count": 4
+  },
+  {
+   "tool": "get_fields",
+   "server": "odoo-screenshot",
+   "args": {
+    "model": "deficiency.item"
+   },
+   "error_class": "harness-permission",
+   "error_head": "Claude requested permissions to use mcp__odoo-screenshot__get_fields, but you haven't granted it yet.",
+   "count": 3
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "model": "questionnaire.questionnaire",
+    "domain": [],
+    "fields": [
+     "id",
+     "name"
+    ],
+    "limit": 10
+   },
+   "error_class": "model-missing",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: Object questionnaire.questionnaire doesn't exist",
+   "count": 3
+  },
+  {
+   "tool": "get_record",
+   "server": "odoo-production",
+   "args": {
+    "model": "project.task",
+    "record_id": 3681,
+    "fields": [
+     "__all__"
+    ]
+   },
+   "error_class": "access-denied",
+   "error_head": "Error executing tool get_record: Connection error: Operation failed: You are not allowed to access 'Metrics Capture' (project.metric.capture) records. This operation is allowed for the following groups: - Metrics/All Metrics Viewer - Metric",
+   "count": 2
+  },
+  {
+   "tool": "get_record",
+   "server": "odoo-production",
+   "args": {
+    "model": "project.task",
+    "record_id": 3632,
+    "fields": [
+     "__all__"
+    ]
+   },
+   "error_class": "access-denied",
+   "error_head": "Error executing tool get_record: Connection error: Operation failed: You are not allowed to access 'Metrics Capture' (project.metric.capture) records. This operation is allowed for the following groups: - Metrics/All Metrics Viewer - Metric",
+   "count": 2
+  },
+  {
+   "tool": "get_fields",
+   "server": "odoo-screenshot",
+   "args": {
+    "model": "project.project"
+   },
+   "error_class": "harness-permission",
+   "error_head": "Claude requested permissions to use mcp__odoo-screenshot__get_fields, but you haven't granted it yet.",
+   "count": 2
+  },
+  {
+   "tool": "get_record",
+   "server": "odoo-s2f-prod",
+   "args": {
+    "model": "product.supplierinfo",
+    "record_id": 166,
+    "fields": [
+     "__all__"
+    ]
+   },
+   "error_class": "impersonation",
+   "error_head": "Error executing tool get_record: Connection error: Operation failed: Only system administrators may use MCP user impersonation.",
+   "count": 2
+  },
+  {
+   "tool": "get_record",
+   "server": "odoo-s2f-prod",
+   "args": {
+    "model": "purchase.order",
+    "record_id": 166,
+    "fields": [
+     "name",
+     "partner_id",
+     "order_line",
+     "state"
+    ]
+   },
+   "error_class": "impersonation",
+   "error_head": "Error executing tool get_record: Connection error: Operation failed: Only system administrators may use MCP user impersonation.",
+   "count": 2
+  },
+  {
+   "tool": "get_record",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "model": "daily_construction.detail",
+    "record_id": 60,
+    "fields": [
+     "requirement_gap_json",
+     "requirement_missing_count",
+     "requirement_total_count"
+    ]
+   },
+   "error_class": "invalid-field",
+   "error_head": "Error executing tool get_record: Connection error: Operation failed: Invalid field 'requirement_gap_json' in request",
+   "count": 2
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "model": "hr.employee",
+    "domain": [
+     [
+      "name",
+      "ilike",
+      "Alanna Byblow"
+     ]
+    ],
+    "fields": [
+     "id",
+     "name"
+    ]
+   },
+   "error_class": "unclassified",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: Cannot connect to Odoo server",
+   "count": 2
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "model": "drp.safety_metric",
+    "domain": [],
+    "fields": [
+     "__all__"
+    ],
+    "limit": 1
+   },
+   "error_class": "unclassified",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: Cannot connect to Odoo server",
+   "count": 2
+  },
+  {
+   "tool": "get_record",
+   "server": "odoo-production",
+   "args": {
+    "model": "project.task",
+    "record_id": 3614,
+    "fields": [
+     "__all__"
+    ]
+   },
+   "error_class": "access-denied",
+   "error_head": "Error executing tool get_record: Connection error: Operation failed: You are not allowed to access 'Metrics Capture' (project.metric.capture) records. This operation is allowed for the following groups: - Metrics/All Metrics Viewer - Metric",
+   "count": 1
+  },
+  {
+   "tool": "get_record",
+   "server": "odoo-screenshot",
+   "args": {
+    "model": "project.task",
+    "record_id": 23,
+    "fields": [
+     "__all__"
+    ]
+   },
+   "error_class": "access-denied",
+   "error_head": "Error executing tool get_record: Connection error: Operation failed: You are not allowed to access 'Metrics Capture' (project.metric.capture) records. This operation is allowed for the following groups: - Metrics/All Metrics Viewer - Metric",
+   "count": 1
+  },
+  {
+   "tool": "get_record",
+   "server": "odoo-production",
+   "args": {
+    "model": "account.move",
+    "record_id": 974,
+    "fields": [
+     "__all__"
+    ]
+   },
+   "error_class": "access-denied",
+   "error_head": "Error executing tool get_record: Connection error: Operation failed: You are not allowed to access 'Stock Valuation Layer' (stock.valuation.layer) records. This operation is allowed for the following groups: - Inventory/Administrator Contac",
+   "count": 1
+  },
+  {
+   "tool": "get_record",
+   "server": "odoo-production",
+   "args": {
+    "model": "solevo.ticket.mirror",
+    "record_id": 142,
+    "fields": [
+     "name",
+     "subject",
+     "description",
+     "active_db",
+     "client_base_url",
+     "from_url",
+     "steps_to_reproduce",
+     "expected_behavior",
+     "actual_behavior",
+     "error_message",
+     "affected_module",
+     "urgency",
+     "submitted_by",
+     "is_reproducible",
+     "started_after"
+    ]
+   },
+   "error_class": "access-denied",
+   "error_head": "Error executing tool get_record: Connection error: Operation failed: Uh-oh! Looks like you have stumbled upon some top-secret records. Sorry, Claude (id=97) doesn't have 'read' access to: - Support Ticket (solevo.ticket.mirror) If you reall",
+   "count": 1
+  },
+  {
+   "tool": "get_record",
+   "server": "odoo-production",
+   "args": {
+    "model": "project.task",
+    "record_id": 3682,
+    "fields": [
+     "__all__"
+    ]
+   },
+   "error_class": "access-denied",
+   "error_head": "Error executing tool get_record: Connection error: Operation failed: You are not allowed to access 'Metrics Capture' (project.metric.capture) records. This operation is allowed for the following groups: - Metrics/All Metrics Viewer - Metric",
+   "count": 1
+  },
+  {
+   "tool": "get_record",
+   "server": "odoo-production",
+   "args": {
+    "model": "project.task",
+    "record_id": 3633,
+    "fields": [
+     "__all__"
+    ]
+   },
+   "error_class": "access-denied",
+   "error_head": "Error executing tool get_record: Connection error: Operation failed: You are not allowed to access 'Metrics Capture' (project.metric.capture) records. This operation is allowed for the following groups: - Metrics/All Metrics Viewer - Metric",
+   "count": 1
+  },
+  {
+   "tool": "get_record",
+   "server": "odoo-production",
+   "args": {
+    "model": "project.task",
+    "record_id": 3680,
+    "fields": [
+     "__all__"
+    ]
+   },
+   "error_class": "access-denied",
+   "error_head": "Error executing tool get_record: Connection error: Operation failed: You are not allowed to access 'Metrics Capture' (project.metric.capture) records. This operation is allowed for the following groups: - Metrics/All Metrics Viewer - Metric",
+   "count": 1
+  },
+  {
+   "tool": "get_record",
+   "server": "odoo-production",
+   "args": {
+    "model": "solevo.ticket.mirror",
+    "record_id": 141
+   },
+   "error_class": "access-denied",
+   "error_head": "Error executing tool get_record: Connection error: Operation failed: Uh-oh! Looks like you have stumbled upon some top-secret records. Sorry, Claude (id=97) doesn't have 'read' access to: - Support Ticket (solevo.ticket.mirror) If you reall",
+   "count": 1
+  },
+  {
+   "tool": "get_record",
+   "server": "odoo-production",
+   "args": {
+    "model": "solevo.ticket.mirror",
+    "record_id": 144,
+    "fields": [
+     "__all__"
+    ]
+   },
+   "error_class": "access-denied",
+   "error_head": "Error executing tool get_record: Connection error: Operation failed: Uh-oh! Looks like you have stumbled upon some top-secret records. Sorry, Claude (id=97) doesn't have 'read' access to: - Support Ticket (solevo.ticket.mirror) If you reall",
+   "count": 1
+  },
+  {
+   "tool": "get_record",
+   "server": "odoo-production",
+   "args": {
+    "model": "project.task",
+    "record_id": 3622,
+    "fields": [
+     "__all__"
+    ]
+   },
+   "error_class": "access-denied",
+   "error_head": "Error executing tool get_record: Connection error: Operation failed: You are not allowed to access 'Metrics Capture' (project.metric.capture) records. This operation is allowed for the following groups: - Metrics/All Metrics Viewer - Metric",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-screenshot",
+   "args": {
+    "model": "site_management.site",
+    "fields": [
+     "id",
+     "name"
+    ],
+    "limit": 10,
+    "order": "name asc"
+   },
+   "error_class": "access-denied",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: You are not allowed to access 'Site' (site_management.site) records. This operation is allowed for the following groups: - Site Management/Manager - Site Management/Us",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-screenshot",
+   "args": {
+    "model": "ir.model.fields",
+    "domain": [
+     [
+      "model",
+      "=",
+      "deficiency.item"
+     ],
+     [
+      "required",
+      "=",
+      true
+     ]
+    ],
+    "fields": [
+     "name",
+     "field_description",
+     "ttype",
+     "relation"
+    ],
+    "limit": 50
+   },
+   "error_class": "access-denied",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: You are not allowed to access 'Fields' (ir.model.fields) records. This operation is allowed for the following groups: - Administration/Access Rights Contact your admin",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-screenshot",
+   "args": {
+    "model": "site_management.site",
+    "fields": [
+     "id",
+     "name"
+    ],
+    "limit": 10
+   },
+   "error_class": "access-denied",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: You are not allowed to access 'Site' (site_management.site) records. This operation is allowed for the following groups: - Site Management/Manager - Site Management/Us",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-screenshot",
+   "args": {
+    "model": "ir.model.fields",
+    "domain": [
+     [
+      "model",
+      "=",
+      "project.task"
+     ],
+     [
+      "required",
+      "=",
+      true
+     ]
+    ],
+    "fields": [
+     "name",
+     "field_description",
+     "ttype",
+     "relation"
+    ],
+    "limit": 50
+   },
+   "error_class": "access-denied",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: You are not allowed to access 'Fields' (ir.model.fields) records. This operation is allowed for the following groups: - Administration/Access Rights Contact your admin",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-screenshot",
+   "args": {
+    "model": "ir.model.fields",
+    "domain": [
+     [
+      "model",
+      "=",
+      "project.project"
+     ],
+     [
+      "ttype",
+      "in",
+      [
+       "many2many",
+       "many2one"
+      ]
+     ]
+    ],
+    "fields": [
+     "name",
+     "field_description",
+     "relation",
+     "ttype"
+    ],
+    "limit": 50
+   },
+   "error_class": "access-denied",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: You are not allowed to access 'Fields' (ir.model.fields) records. This operation is allowed for the following groups: - Administration/Access Rights Contact your admin",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-production",
+   "args": {
+    "model": "fox.bank.connection",
+    "domain": [],
+    "fields": [
+     "id",
+     "name",
+     "state",
+     "access_token_encrypted"
+    ],
+    "limit": 20
+   },
+   "error_class": "access-denied",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: You are not allowed to access 'Fox Bank Connection' (fox.bank.connection) records. This operation is allowed for the following groups: - Foxlogik Bank Sync/Manager - F",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-screenshot",
+   "args": {
+    "model": "ir.model.fields",
+    "domain": [
+     [
+      "model",
+      "=",
+      "account.analytic.line"
+     ],
+     [
+      "name",
+      "in",
+      [
+       "employee_id",
+       "user_id",
+       "task_id",
+       "project_id",
+       "unit_amount",
+       "name",
+       "date"
+      ]
+     ]
+    ],
+    "fields": [
+     "name",
+     "required",
+     "relation"
+    ],
+    "limit": 20
+   },
+   "error_class": "access-denied",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: You are not allowed to access 'Fields' (ir.model.fields) records. This operation is allowed for the following groups: - Administration/Access Rights Contact your admin",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-production",
+   "args": {
+    "model": "warning.type",
+    "fields": [
+     "name"
+    ],
+    "limit": 30
+   },
+   "error_class": "access-denied",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: You are not allowed to access 'Warning Type' (warning.type) records. This operation is allowed for the following groups: - Dynamic Warning System/Manager - Dynamic War",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-production",
+   "args": {
+    "model": "queue.job",
+    "domain": [
+     [
+      "state",
+      "in",
+      [
+       "failed",
+       "started"
+      ]
+     ]
+    ],
+    "fields": [
+     "name",
+     "state",
+     "date_created"
+    ],
+    "limit": 3
+   },
+   "error_class": "access-denied",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: You are not allowed to access 'Queue Job' (queue.job) records. This operation is allowed for the following groups: - Job Queue/Job Queue Manager Contact your administr",
+   "count": 1
+  },
+  {
+   "tool": "get_record",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "model": "daily_construction.report",
+    "res_id": "39",
+    "fields": [
+     "id",
+     "name",
+     "site_id",
+     "date"
+    ]
+   },
+   "error_class": "arg-name",
+   "error_head": "Error executing tool get_record: 1 validation error for get_recordArguments record_id Field required [type=missing, input_value={'model': 'daily_construc...me', 'site_id', 'date']}, input_type=dict] For further information visit <url>",
+   "count": 1
+  },
+  {
+   "tool": "get_record",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "model": "daily_construction.report",
+    "res_id": "52",
+    "fields": [
+     "rem_tailgate",
+     "rem_incident",
+     "rem_env_concern",
+     "rem_issue_doc",
+     "general_info_line_ids",
+     "contractor_attendance_line_ids",
+     "equipment_line_ids",
+     "safety_metric_line_ids",
+     "weather_data_id"
+    ]
+   },
+   "error_class": "arg-name",
+   "error_head": "Error executing tool get_record: 1 validation error for get_recordArguments record_id Field required [type=missing, input_value={'model': 'daily_construc...ds', 'weather_data_id']}, input_type=dict] For further information visit <url>",
+   "count": 1
+  },
+  {
+   "tool": "get_record",
+   "server": "odoo-s2f-prod",
+   "args": {
+    "model": "account.analytic.distribution.selection.model",
+    "res_id": "164"
+   },
+   "error_class": "arg-name",
+   "error_head": "Error executing tool get_record: 1 validation error for get_recordArguments record_id Field required [type=missing, input_value={'model': 'account.analyt...model', 'res_id': '164'}, input_type=dict] For further information visit <url>",
+   "count": 1
+  },
+  {
+   "tool": "get_record",
+   "server": "odoo-s2f-prod",
+   "args": {
+    "model": "res.partner",
+    "res_id": "1765",
+    "fields": [
+     "id",
+     "name",
+     "active",
+     "parent_id",
+     "user_ids",
+     "employee_ids"
+    ]
+   },
+   "error_class": "arg-name",
+   "error_head": "Error executing tool get_record: 1 validation error for get_recordArguments record_id Field required [type=missing, input_value={'model': 'res.partner', ...r_ids', 'employee_ids']}, input_type=dict] For further information visit <url>",
+   "count": 1
+  },
+  {
+   "tool": "get_record",
+   "server": "odoo-s2f-prod",
+   "args": {
+    "model": "purchase.order.line",
+    "res_id": "378"
+   },
+   "error_class": "arg-name",
+   "error_head": "Error executing tool get_record: 1 validation error for get_recordArguments record_id Field required [type=missing, input_value={'model': 'purchase.order.line', 'res_id': '378'}, input_type=dict] For further information visit <url>",
+   "count": 1
+  },
+  {
+   "tool": "get_record",
+   "server": "odoo-s2f-prod",
+   "args": {
+    "model": "account.analytic.distribution.selection.model",
+    "res_id": "96",
+    "fields": [
+     "name",
+     "analytic_distribution_line_ids",
+     "domain",
+     "model_name"
+    ]
+   },
+   "error_class": "arg-name",
+   "error_head": "Error executing tool get_record: 1 validation error for get_recordArguments record_id Field required [type=missing, input_value={'model': 'account.analyt...'domain', 'model_name']}, input_type=dict] For further information visit <url>",
+   "count": 1
+  },
+  {
+   "tool": "get_record",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "model": "fleet.vehicle",
+    "res_id": "1",
+    "fields": [
+     "id",
+     "name",
+     "driver_id",
+     "inspection_template_id"
+    ]
+   },
+   "error_class": "arg-name",
+   "error_head": "Error executing tool get_record: 1 validation error for get_recordArguments record_id Field required [type=missing, input_value={'model': 'fleet.vehicle'...nspection_template_id']}, input_type=dict] For further information visit <url>",
+   "count": 1
+  },
+  {
+   "tool": "get_record",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "model": "fleet.vehicle",
+    "res_id": "1"
+   },
+   "error_class": "arg-name",
+   "error_head": "Error executing tool get_record: 1 validation error for get_recordArguments record_id Field required [type=missing, input_value={'model': 'fleet.vehicle', 'res_id': '1'}, input_type=dict] For further information visit <url>",
+   "count": 1
+  },
+  {
+   "tool": "get_record",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "model": "fleet.vehicle.inspection",
+    "res_id": "1",
+    "fields": [
+     "id",
+     "name",
+     "note",
+     "result",
+     "state"
+    ]
+   },
+   "error_class": "arg-name",
+   "error_head": "Error executing tool get_record: 1 validation error for get_recordArguments record_id Field required [type=missing, input_value={'model': 'fleet.vehicle....te', 'result', 'state']}, input_type=dict] For further information visit <url>",
+   "count": 1
+  },
+  {
+   "tool": "get_record",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "model": "daily_construction.report",
+    "res_id": "60"
+   },
+   "error_class": "arg-name",
+   "error_head": "Error executing tool get_record: 1 validation error for get_recordArguments record_id Field required [type=missing, input_value={'model': 'daily_construc...report', 'res_id': '60'}, input_type=dict] For further information visit <url>",
+   "count": 1
+  },
+  {
+   "tool": "get_record",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "model": "daily_construction.report",
+    "res_id": "55"
+   },
+   "error_class": "arg-name",
+   "error_head": "Error executing tool get_record: 1 validation error for get_recordArguments record_id Field required [type=missing, input_value={'model': 'daily_construc...report', 'res_id': '55'}, input_type=dict] For further information visit <url>",
+   "count": 1
+  },
+  {
+   "tool": "get_record",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "model": "daily_construction.report",
+    "res_id": "55",
+    "fields": [
+     "id",
+     "name",
+     "state",
+     "report_date",
+     "site_id"
+    ]
+   },
+   "error_class": "arg-name",
+   "error_head": "Error executing tool get_record: 1 validation error for get_recordArguments record_id Field required [type=missing, input_value={'model': 'daily_construc...eport_date', 'site_id']}, input_type=dict] For further information visit <url>",
+   "count": 1
+  },
+  {
+   "tool": "get_record",
+   "server": "odoo-s2f-prod",
+   "args": {
+    "model": "hr.employee.timesheet.template",
+    "res_id": "251"
+   },
+   "error_class": "arg-name",
+   "error_head": "Error executing tool get_record: 1 validation error for get_recordArguments record_id Field required [type=missing, input_value={'model': 'hr.employee.ti...plate', 'res_id': '251'}, input_type=dict] For further information visit <url>",
+   "count": 1
+  },
+  {
+   "tool": "get_record",
+   "server": "odoo-s2f-prod",
+   "args": {
+    "model": "sale.order",
+    "res_id": "193",
+    "fields": [
+     "id",
+     "name",
+     "partner_id",
+     "amount_total",
+     "invoice_ids",
+     "order_line",
+     "date_order",
+     "state"
+    ]
+   },
+   "error_class": "arg-name",
+   "error_head": "Error executing tool get_record: 1 validation error for get_recordArguments record_id Field required [type=missing, input_value={'model': 'sale.order', '... 'date_order', 'state']}, input_type=dict] For further information visit <url>",
+   "count": 1
+  },
+  {
+   "tool": "get_record",
+   "server": "odoo-s2f-prod",
+   "args": {
+    "model": "project.project",
+    "res_id": "3",
+    "fields": [
+     "timesheet_lock_enabled",
+     "timesheet_lock_datetime",
+     "timesheet_lock_grace_hours",
+     "timesheet_lock_period_start",
+     "timesheet_lock_period_end",
+     "timesheet_lock_sequence"
+    ]
+   },
+   "error_class": "arg-name",
+   "error_head": "Error executing tool get_record: 1 validation error for get_recordArguments record_id Field required [type=missing, input_value={'model': 'project.projec...mesheet_lock_sequence']}, input_type=dict] For further information visit <url>",
+   "count": 1
+  },
+  {
+   "tool": "get_record",
+   "server": "odoo-production",
+   "args": {
+    "model": "account.move.line",
+    "res_id": "6018",
+    "fields": [
+     "date",
+     "balance",
+     "name",
+     "account_id",
+     "move_id",
+     "partner_id",
+     "ref",
+     "journal_id"
+    ]
+   },
+   "error_class": "arg-name",
+   "error_head": "Error executing tool get_record: 1 validation error for get_recordArguments record_id Field required [type=missing, input_value={'model': 'account.move.l...', 'ref', 'journal_id']}, input_type=dict] For further information visit <url>",
+   "count": 1
+  },
+  {
+   "tool": "get_record",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "model": "fleet.vehicle.model.brand",
+    "res_id": "61"
+   },
+   "error_class": "arg-name",
+   "error_head": "Error executing tool get_record: 1 validation error for get_recordArguments record_id Field required [type=missing, input_value={'model': 'fleet.vehicle.....brand', 'res_id': '61'}, input_type=dict] For further information visit <url>",
+   "count": 1
+  },
+  {
+   "tool": "get_record",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "model": "hr.employee",
+    "id": "4",
+    "fields": [
+     "id",
+     "name",
+     "site_id"
+    ]
+   },
+   "error_class": "arg-name",
+   "error_head": "Error executing tool get_record: 1 validation error for get_recordArguments record_id Field required [type=missing, input_value={'model': 'hr.employee', ...id', 'name', 'site_id']}, input_type=dict] For further information visit <url>",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "model": "mail.message",
+    "domain": [
+     [
+      "model",
+      "=",
+      "daily_construction.detail"
+     ],
+     [
+      "res_id",
+      75
+     ],
+     [
+      "message_type",
+      "=",
+      "comment"
+     ]
+    ],
+    "fields": [
+     "id",
+     "body",
+     "author_id",
+     "attachment_ids",
+     "date",
+     "include_in_report",
+     "report_detail_id"
+    ],
+    "order": "date asc",
+    "limit": 100
+   },
+   "error_class": "bad-leaf",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: File, in xmlrpc_2 response = self._xmlrpc(service) file, in _xmlrpc result = dispatch_rpc(service, method, params) file, in dispatch_rpc return dispatch(method, params",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "model": "res.users",
+    "domain": [
+     [
+      "|"
+     ],
+     [
+      "login",
+      "=",
+      "support@foxlogik.com"
+     ],
+     [
+      "email",
+      "=",
+      "support@foxlogik.com"
+     ]
+    ],
+    "fields": [
+     "id",
+     "tz",
+     "login"
+    ],
+    "limit": 1
+   },
+   "error_class": "bad-leaf",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: File, in xmlrpc_2 response = self._xmlrpc(service) file, in _xmlrpc result = dispatch_rpc(service, method, params) file, in dispatch_rpc return dispatch(method, params",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "model": "mail.message",
+    "domain": [
+     [
+      "model",
+      "=",
+      "discuss.channel"
+     ],
+     [
+      "res_id",
+      738
+     ],
+     [
+      "message_type",
+      "=",
+      "comment"
+     ]
+    ],
+    "fields": [
+     "id",
+     "body",
+     "author_id",
+     "attachment_ids",
+     "date",
+     "include_in_report",
+     "report_detail_id"
+    ],
+    "limit": 100,
+    "order": "date asc"
+   },
+   "error_class": "bad-leaf",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: File, in xmlrpc_2 response = self._xmlrpc(service) file, in _xmlrpc result = dispatch_rpc(service, method, params) file, in dispatch_rpc return dispatch(method, params",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "model": "mail.message",
+    "domain": [
+     [
+      "model",
+      "=",
+      "discuss.channel"
+     ],
+     [
+      "res_id",
+      657
+     ],
+     [
+      "message_type",
+      "=",
+      "comment"
+     ]
+    ],
+    "fields": [
+     "id",
+     "body",
+     "author_id",
+     "attachment_ids",
+     "date",
+     "include_in_report",
+     "report_detail_id"
+    ],
+    "order": "date asc",
+    "limit": 100
+   },
+   "error_class": "bad-leaf",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: File, in xmlrpc_2 response = self._xmlrpc(service) file, in _xmlrpc result = dispatch_rpc(service, method, params) file, in dispatch_rpc return dispatch(method, params",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "model": "mail.message",
+    "domain": [
+     [
+      "model",
+      "=",
+      "discuss.channel"
+     ],
+     [
+      "res_id",
+      693,
+      "="
+     ],
+     [
+      "message_type",
+      "=",
+      "comment"
+     ]
+    ],
+    "fields": [
+     "id",
+     "body",
+     "author_id",
+     "attachment_ids",
+     "date",
+     "include_in_report",
+     "report_detail_id"
+    ],
+    "order": "date asc",
+    "limit": 100
+   },
+   "error_class": "bad-leaf",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: File, in xmlrpc_2 response = self._xmlrpc(service) file, in _xmlrpc result = dispatch_rpc(service, method, params) file, in dispatch_rpc return dispatch(method, params",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "model": "mail.message",
+    "domain": [
+     [
+      "model",
+      "=",
+      "discuss.channel"
+     ],
+     [
+      "res_id",
+      683
+     ],
+     [
+      "message_type",
+      "=",
+      "comment"
+     ],
+     [
+      "id",
+      ">",
+      322790
+     ]
+    ],
+    "fields": [
+     "id",
+     "body",
+     "author_id",
+     "attachment_ids",
+     "date",
+     "include_in_report",
+     "report_detail_id"
+    ],
+    "limit": 100,
+    "order": "date asc"
+   },
+   "error_class": "bad-leaf",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: File, in xmlrpc_2 response = self._xmlrpc(service) file, in _xmlrpc result = dispatch_rpc(service, method, params) file, in dispatch_rpc return dispatch(method, params",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-production",
+   "args": {
+    "model": "sprint.task",
+    "domain": [
+     [
+      "start_date",
+      "&lt;=",
+      "2026-08-18"
+     ],
+     [
+      "end_date",
+      "&gt;=",
+      "2026-08-18"
+     ]
+    ],
+    "fields": [
+     "name",
+     "start_date",
+     "end_date"
+    ],
+    "limit": 5
+   },
+   "error_class": "bad-leaf",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: File, in xmlrpc_2 response = self._xmlrpc(service) ^^^^^^^^^^^^^^^^^^^^^ file, in _xmlrpc result = dispatch_rpc(service, method, params) ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "model": "mail.message",
+    "domain": [
+     [
+      "model",
+      "=",
+      "discuss.channel"
+     ],
+     [
+      "res_id",
+      773
+     ],
+     [
+      "message_type",
+      "=",
+      "comment"
+     ]
+    ],
+    "fields": [
+     "id",
+     "body",
+     "author_id",
+     "attachment_ids",
+     "date",
+     "include_in_report",
+     "report_detail_id"
+    ],
+    "order": "date asc",
+    "limit": 100
+   },
+   "error_class": "bad-leaf",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: File, in xmlrpc_2 response = self._xmlrpc(service) file, in _xmlrpc result = dispatch_rpc(service, method, params) file, in dispatch_rpc return dispatch(method, params",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "model": "mail.message",
+    "domain": [
+     [
+      "model",
+      "=",
+      "discuss.channel"
+     ],
+     [
+      "res_id",
+      684
+     ],
+     [
+      "message_type",
+      "=",
+      "comment"
+     ]
+    ],
+    "fields": [
+     "id",
+     "body",
+     "author_id",
+     "attachment_ids",
+     "date",
+     "include_in_report",
+     "report_detail_id"
+    ],
+    "limit": 50,
+    "order": "date asc"
+   },
+   "error_class": "bad-leaf",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: File, in xmlrpc_2 response = self._xmlrpc(service) file, in _xmlrpc result = dispatch_rpc(service, method, params) file, in dispatch_rpc return dispatch(method, params",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "model": "mail.message",
+    "domain": [
+     [
+      "model",
+      "=",
+      "discuss.channel"
+     ],
+     [
+      "res_id",
+      646
+     ],
+     [
+      "message_type",
+      "=",
+      "comment"
+     ]
+    ],
+    "fields": [
+     "id",
+     "body",
+     "author_id",
+     "attachment_ids",
+     "date",
+     "include_in_report",
+     "report_detail_id"
+    ],
+    "order": "date asc",
+    "limit": 100
+   },
+   "error_class": "bad-leaf",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: File, in xmlrpc_2 response = self._xmlrpc(service) file, in _xmlrpc result = dispatch_rpc(service, method, params) file, in dispatch_rpc return dispatch(method, params",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "model": "mail.message",
+    "domain": [
+     [
+      "model",
+      "=",
+      "discuss.channel"
+     ],
+     [
+      "res_id",
+      761
+     ],
+     [
+      "message_type",
+      "=",
+      "comment"
+     ]
+    ],
+    "fields": [
+     "id",
+     "body",
+     "author_id",
+     "attachment_ids",
+     "date",
+     "include_in_report",
+     "report_detail_id"
+    ],
+    "limit": 100,
+    "order": "date asc"
+   },
+   "error_class": "bad-leaf",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: File, in xmlrpc_2 response = self._xmlrpc(service) file, in _xmlrpc result = dispatch_rpc(service, method, params) file, in dispatch_rpc return dispatch(method, params",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "model": "mail.message",
+    "domain": [
+     [
+      "model",
+      "=",
+      "daily_construction.report"
+     ],
+     [
+      "res_id",
+      55
+     ],
+     [
+      "message_type",
+      "=",
+      "comment"
+     ]
+    ],
+    "fields": [
+     "id",
+     "body",
+     "author_id",
+     "attachment_ids",
+     "date",
+     "include_in_report",
+     "report_detail_id"
+    ],
+    "limit": 100,
+    "order": "date asc"
+   },
+   "error_class": "bad-leaf",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: File, in xmlrpc_2 response = self._xmlrpc(service) file, in _xmlrpc result = dispatch_rpc(service, method, params) file, in dispatch_rpc return dispatch(method, params",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "model": "mail.message",
+    "domain": [
+     [
+      "model",
+      "=",
+      "discuss.channel"
+     ],
+     [
+      "res_id",
+      769
+     ],
+     [
+      "message_type",
+      "=",
+      "comment"
+     ]
+    ],
+    "fields": [
+     "id",
+     "body",
+     "author_id",
+     "attachment_ids",
+     "date",
+     "include_in_report",
+     "report_detail_id"
+    ],
+    "order": "date asc",
+    "limit": 100
+   },
+   "error_class": "bad-leaf",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: File, in xmlrpc_2 response = self._xmlrpc(service) file, in _xmlrpc result = dispatch_rpc(service, method, params) file, in dispatch_rpc return dispatch(method, params",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "model": "mail.message",
+    "domain": [
+     [
+      "model",
+      "=",
+      "discuss.channel"
+     ],
+     [
+      "res_id",
+      649
+     ],
+     [
+      "message_type",
+      "=",
+      "comment"
+     ]
+    ],
+    "fields": [
+     "id",
+     "body",
+     "author_id",
+     "attachment_ids",
+     "date",
+     "include_in_report",
+     "report_detail_id"
+    ],
+    "order": "date asc",
+    "limit": 100
+   },
+   "error_class": "bad-leaf",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: File, in xmlrpc_2 response = self._xmlrpc(service) file, in _xmlrpc result = dispatch_rpc(service, method, params) file, in dispatch_rpc return dispatch(method, params",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "model": "mail.message",
+    "domain": [
+     [
+      "model",
+      "=",
+      "discuss.channel"
+     ],
+     [
+      "res_id",
+      774
+     ],
+     [
+      "message_type",
+      "=",
+      "comment"
+     ]
+    ],
+    "fields": [
+     "id",
+     "body",
+     "author_id",
+     "attachment_ids",
+     "date",
+     "include_in_report",
+     "report_detail_id"
+    ],
+    "order": "date asc",
+    "limit": 100
+   },
+   "error_class": "bad-leaf",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: File, in xmlrpc_2 response = self._xmlrpc(service) file, in _xmlrpc result = dispatch_rpc(service, method, params) file, in dispatch_rpc return dispatch(method, params",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "model": "mail.message",
+    "domain": [
+     [
+      "model",
+      "=",
+      "daily_construction.report"
+     ],
+     [
+      "res_id",
+      65
+     ],
+     [
+      "message_type",
+      "=",
+      "comment"
+     ]
+    ],
+    "fields": [
+     "id",
+     "body",
+     "author_id",
+     "attachment_ids",
+     "date",
+     "include_in_report",
+     "report_detail_id"
+    ],
+    "order": "date asc",
+    "limit": 100
+   },
+   "error_class": "bad-leaf",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: File, in xmlrpc_2 response = self._xmlrpc(service) file, in _xmlrpc result = dispatch_rpc(service, method, params) file, in dispatch_rpc return dispatch(method, params",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "model": "mail.message",
+    "domain": [
+     [
+      "model",
+      "=",
+      "discuss.channel"
+     ],
+     [
+      "res_id",
+      749
+     ],
+     [
+      "message_type",
+      "=",
+      "comment"
+     ]
+    ],
+    "fields": [
+     "id",
+     "body",
+     "author_id",
+     "attachment_ids",
+     "date",
+     "include_in_report",
+     "report_detail_id"
+    ],
+    "order": "date asc",
+    "limit": 100
+   },
+   "error_class": "bad-leaf",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: File, in xmlrpc_2 response = self._xmlrpc(service) file, in _xmlrpc result = dispatch_rpc(service, method, params) file, in dispatch_rpc return dispatch(method, params",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "model": "mail.message",
+    "domain": [
+     [
+      "model",
+      "=",
+      "discuss.channel"
+     ],
+     [
+      "res_id",
+      762
+     ]
+    ],
+    "fields": [
+     "id",
+     "body",
+     "author_id",
+     "attachment_ids",
+     "date",
+     "include_in_report",
+     "report_detail_id",
+     "message_type"
+    ],
+    "order": "date desc",
+    "limit": 20
+   },
+   "error_class": "bad-leaf",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: File, in xmlrpc_2 response = self._xmlrpc(service) file, in _xmlrpc result = dispatch_rpc(service, method, params) file, in dispatch_rpc return dispatch(method, params",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "model": "checkitem.activity",
+    "domain": [
+     [
+      "res_model",
+      "=",
+      "daily_construction.detail"
+     ],
+     [
+      "res_id",
+      72
+     ]
+    ],
+    "fields": [
+     "id",
+     "summary",
+     "note"
+    ],
+    "limit": 20
+   },
+   "error_class": "bad-leaf",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: File, in xmlrpc_2 response = self._xmlrpc(service) file, in _xmlrpc result = dispatch_rpc(service, method, params) file, in dispatch_rpc return dispatch(method, params",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "model": "mail.message",
+    "domain": [
+     [
+      "model",
+      "=",
+      "discuss.channel"
+     ],
+     [
+      "res_id",
+      747
+     ],
+     [
+      "message_type",
+      "=",
+      "comment"
+     ]
+    ],
+    "fields": [
+     "id",
+     "body",
+     "author_id",
+     "attachment_ids",
+     "date",
+     "message_type"
+    ],
+    "limit": 50,
+    "order": "date desc"
+   },
+   "error_class": "bad-leaf",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: File, in xmlrpc_2 response = self._xmlrpc(service) file, in _xmlrpc result = dispatch_rpc(service, method, params) file, in dispatch_rpc return dispatch(method, params",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "model": "mail.message",
+    "domain": [
+     "&",
+     [
+      "message_type",
+      "=",
+      "comment"
+     ],
+     "|",
+     "&",
+     [
+      "model",
+      "=",
+      "discuss.channel"
+     ],
+     [
+      "res_id",
+      778
+     ],
+     "&",
+     [
+      "model",
+      "=",
+      "daily_construction.report"
+     ],
+     [
+      "res_id",
+      "=",
+      68
+     ]
+    ],
+    "fields": [
+     "id",
+     "body",
+     "author_id",
+     "attachment_ids",
+     "date",
+     "include_in_report",
+     "report_detail_id",
+     "model",
+     "res_id"
+    ],
+    "order": "date asc",
+    "limit": 100
+   },
+   "error_class": "bad-leaf",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: File, in xmlrpc_2 response = self._xmlrpc(service) file, in _xmlrpc result = dispatch_rpc(service, method, params) file, in dispatch_rpc return dispatch(method, params",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-production",
+   "args": {
+    "model": "mail.message",
+    "domain": [
+     [
+      "model",
+      "=",
+      "project.task"
+     ],
+     [
+      "res_id",
+      3622
+     ]
+    ],
+    "fields": [
+     "body",
+     "author_id",
+     "date",
+     "message_type"
+    ],
+    "limit": 20,
+    "order": "id desc"
+   },
+   "error_class": "bad-leaf",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: File, in xmlrpc_2 response = self._xmlrpc(service) ^^^^^^^^^^^^^^^^^^^^^ file, in _xmlrpc result = dispatch_rpc(service, method, params) ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
+   "count": 1
+  },
+  {
+   "tool": "check_access",
+   "server": "odoo-screenshot",
+   "args": {
+    "model": "deficiency.item",
+    "operation": "create"
+   },
+   "error_class": "harness-permission",
+   "error_head": "Claude requested permissions to use mcp__odoo-screenshot__check_access, but you haven't granted it yet.",
+   "count": 1
+  },
+  {
+   "tool": "get_defaults",
+   "server": "odoo-screenshot",
+   "args": {
+    "model": "deficiency.item",
+    "fields": [
+     "name",
+     "description",
+     "site_id",
+     "project_id",
+     "category_id",
+     "location_id",
+     "discipline_id",
+     "type_id",
+     "phase_id",
+     "responsible_id",
+     "date"
+    ]
+   },
+   "error_class": "harness-permission",
+   "error_head": "Claude requested permissions to use mcp__odoo-screenshot__get_defaults, but you haven't granted it yet.",
+   "count": 1
+  },
+  {
+   "tool": "get_fields",
+   "server": "odoo-screenshot",
+   "args": {
+    "model": "project.project",
+    "attributes": [
+     "string",
+     "type",
+     "required",
+     "relation"
+    ]
+   },
+   "error_class": "harness-permission",
+   "error_head": "Claude requested permissions to use mcp__odoo-screenshot__get_fields, but you haven't granted it yet.",
+   "count": 1
+  },
+  {
+   "tool": "get_record",
+   "server": "odoo-s2f-prod",
+   "args": {
+    "model": "purchase.order",
+    "record_id": 166,
+    "fields": [
+     "name",
+     "partner_id",
+     "state",
+     "date_order",
+     "amount_total",
+     "amount_untaxed",
+     "currency_id",
+     "user_id",
+     "origin",
+     "partner_ref",
+     "order_line",
+     "picking_type_id",
+     "payment_term_id",
+     "company_id",
+     "notes"
+    ]
+   },
+   "error_class": "impersonation",
+   "error_head": "Error executing tool get_record: Connection error: Operation failed: Only system administrators may use MCP user impersonation.",
+   "count": 1
+  },
+  {
+   "tool": "get_record",
+   "server": "odoo-s2f-prod",
+   "args": {
+    "model": "purchase.order",
+    "record_id": 166
+   },
+   "error_class": "impersonation",
+   "error_head": "Error executing tool get_record: Connection error: Operation failed: Only system administrators may use MCP user impersonation.",
+   "count": 1
+  },
+  {
+   "tool": "get_record",
+   "server": "odoo-s2f-prod",
+   "args": {
+    "model": "project.task",
+    "record_id": 970,
+    "fields": [
+     "__all__"
+    ]
+   },
+   "error_class": "impersonation",
+   "error_head": "Error executing tool get_record: Connection error: Operation failed: Only system administrators may use MCP user impersonation.",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-s2f-prod",
+   "args": {
+    "model": "purchase.order",
+    "domain": [
+     [
+      "id",
+      "=",
+      166
+     ]
+    ],
+    "fields": [
+     "name",
+     "partner_id",
+     "state",
+     "date_order",
+     "amount_total",
+     "amount_untaxed",
+     "currency_id",
+     "user_id",
+     "origin",
+     "partner_ref",
+     "picking_type_id",
+     "payment_term_id",
+     "company_id"
+    ]
+   },
+   "error_class": "impersonation",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: Only system administrators may use MCP user impersonation.",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-s2f-prod",
+   "args": {
+    "model": "res.partner",
+    "domain": [
+     [
+      "id",
+      "=",
+      1
+     ]
+    ],
+    "fields": [
+     "name"
+    ],
+    "limit": 1
+   },
+   "error_class": "impersonation",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: Only system administrators may use MCP user impersonation.",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-s2f-prod",
+   "args": {
+    "model": "hr.employee",
+    "domain": [
+     [
+      "name",
+      "ilike",
+      "Kutschinski"
+     ]
+    ],
+    "fields": [
+     "name",
+     "user_id",
+     "job_title"
+    ]
+   },
+   "error_class": "impersonation",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: Only system administrators may use MCP user impersonation.",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-s2f-prod",
+   "args": {
+    "model": "hr.employee",
+    "domain": [
+     [
+      "name",
+      "ilike",
+      "Kutschinski"
+     ]
+    ],
+    "fields": [
+     "name"
+    ]
+   },
+   "error_class": "impersonation",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: Only system administrators may use MCP user impersonation.",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-s2f-prod",
+   "args": {
+    "model": "ir.model.fields",
+    "domain": [
+     [
+      "model",
+      "=",
+      "project.task"
+     ],
+     [
+      "field_description",
+      "ilike",
+      "product"
+     ]
+    ],
+    "fields": [
+     "name",
+     "field_description",
+     "ttype",
+     "relation"
+    ]
+   },
+   "error_class": "impersonation",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: Only system administrators may use MCP user impersonation.",
+   "count": 1
+  },
+  {
+   "tool": "get_record",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "model": "daily_construction.report",
+    "record_id": 39,
+    "fields": [
+     "id",
+     "name",
+     "site_id",
+     "date"
+    ]
+   },
+   "error_class": "invalid-field",
+   "error_head": "Error executing tool get_record: Connection error: Operation failed: Invalid field 'date' in request",
+   "count": 1
+  },
+  {
+   "tool": "get_record",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "model": "questionnaire.checkitem.session",
+    "record_id": 16,
+    "fields": [
+     "id",
+     "panel_json",
+     "state"
+    ]
+   },
+   "error_class": "invalid-field",
+   "error_head": "Error executing tool get_record: Connection error: Operation failed: Invalid field 'state' in request",
+   "count": 1
+  },
+  {
+   "tool": "get_record",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "model": "claude.field.proposal",
+    "record_id": 614,
+    "fields": [
+     "id",
+     "state",
+     "model_name",
+     "res_id",
+     "dcr_report_id",
+     "error_message",
+     "thinking_message_id",
+     "reply_channel_id",
+     "create_date",
+     "write_date",
+     "audit_log",
+     "wants_followup",
+     "operation",
+     "bot_id",
+     "requesting_user_id"
+    ]
+   },
+   "error_class": "invalid-field",
+   "error_head": "Error executing tool get_record: Connection error: Operation failed: Invalid field 'model_name' in request",
+   "count": 1
+  },
+  {
+   "tool": "get_record",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "model": "claude.field.proposal",
+    "record_id": 616,
+    "fields": [
+     "id",
+     "state",
+     "error_message",
+     "audit_log",
+     "write_date",
+     "wants_followup",
+     "operation"
+    ]
+   },
+   "error_class": "invalid-field",
+   "error_head": "Error executing tool get_record: Connection error: Operation failed: Invalid field 'operation' in request",
+   "count": 1
+  },
+  {
+   "tool": "get_record",
+   "server": "odoo-production",
+   "args": {
+    "model": "project.task",
+    "record_id": 3633,
+    "fields": [
+     "id",
+     "name",
+     "stage_id",
+     "kanban_state"
+    ]
+   },
+   "error_class": "invalid-field",
+   "error_head": "Error executing tool get_record: Connection error: Operation failed: Invalid field 'kanban_state' in request",
+   "count": 1
+  },
+  {
+   "tool": "get_record",
+   "server": "odoo-production",
+   "args": {
+    "model": "solevo.ticket.mirror",
+    "record_id": 142,
+    "fields": [
+     "name",
+     "subject",
+     "description",
+     "active_db",
+     "client_base_url",
+     "from_url",
+     "steps_to_reproduce",
+     "expected_behavior",
+     "actual_behavior",
+     "error_message",
+     "affected_module",
+     "urgency",
+     "submitted_by",
+     "is_reproducible",
+     "started_after",
+     "message"
+    ]
+   },
+   "error_class": "invalid-field",
+   "error_head": "Error executing tool get_record: Connection error: Operation failed: Invalid field 'message' in request",
+   "count": 1
+  },
+  {
+   "tool": "get_record",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "model": "daily_construction.detail",
+    "record_id": 60,
+    "fields": [
+     "id",
+     "requirement_missing_count",
+     "requirement_total_count"
+    ]
+   },
+   "error_class": "invalid-field",
+   "error_head": "Error executing tool get_record: Connection error: Operation failed: Invalid field 'requirement_missing_count' in request",
+   "count": 1
+  },
+  {
+   "tool": "get_record",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "model": "daily_construction.detail",
+    "record_id": 54,
+    "fields": [
+     "requirement_gap_json",
+     "requirement_missing_count",
+     "requirement_total_count"
+    ]
+   },
+   "error_class": "invalid-field",
+   "error_head": "Error executing tool get_record: Connection error: Operation failed: Invalid field 'requirement_gap_json' in request",
+   "count": 1
+  },
+  {
+   "tool": "get_record",
+   "server": "odoo-production",
+   "args": {
+    "model": "claude.bot.config",
+    "record_id": 2,
+    "fields": [
+     "name",
+     "profile",
+     "active",
+     "ai_model_id",
+     "allowed_skill_ids",
+     "skill_ids",
+     "service_provider_id"
+    ]
+   },
+   "error_class": "invalid-field",
+   "error_head": "Error executing tool get_record: Connection error: Operation failed: Invalid field 'allowed_skill_ids' in request",
+   "count": 1
+  },
+  {
+   "tool": "get_record",
+   "server": "odoo-production",
+   "args": {
+    "model": "claude.bot.config",
+    "record_id": 2,
+    "fields": [
+     "name",
+     "profile",
+     "active",
+     "ai_model_id",
+     "skill_ids"
+    ]
+   },
+   "error_class": "invalid-field",
+   "error_head": "Error executing tool get_record: Connection error: Operation failed: Invalid field 'skill_ids' in request",
+   "count": 1
+  },
+  {
+   "tool": "get_record",
+   "server": "odoo-production",
+   "args": {
+    "model": "claude.field.proposal",
+    "record_id": 218,
+    "fields": [
+     "state",
+     "model",
+     "res_id",
+     "reply_channel_id",
+     "error_message",
+     "raw_response",
+     "bot_id",
+     "is_followup",
+     "followup_depth",
+     "create_date",
+     "write_date"
+    ]
+   },
+   "error_class": "invalid-field",
+   "error_head": "Error executing tool get_record: Connection error: Operation failed: Invalid field 'raw_response' in request",
+   "count": 1
+  },
+  {
+   "tool": "get_record",
+   "server": "odoo-s2f-prod",
+   "args": {
+    "model": "hr.employee",
+    "record_id": 275,
+    "fields": [
+     "id",
+     "name",
+     "user_id",
+     "address_home_id",
+     "work_contact_id"
+    ]
+   },
+   "error_class": "invalid-field",
+   "error_head": "Error executing tool get_record: Connection error: Operation failed: Invalid field 'address_home_id' in request",
+   "count": 1
+  },
+  {
+   "tool": "get_record",
+   "server": "odoo-s2f-prod",
+   "args": {
+    "model": "purchase.order",
+    "record_id": 167,
+    "fields": [
+     "name",
+     "state",
+     "partner_id",
+     "project_id",
+     "pricelist_id",
+     "employee_id",
+     "user_id",
+     "company_id"
+    ]
+   },
+   "error_class": "invalid-field",
+   "error_head": "Error executing tool get_record: Connection error: Operation failed: Invalid field 'project_id' in request",
+   "count": 1
+  },
+  {
+   "tool": "get_record",
+   "server": "odoo-s2f-prod",
+   "args": {
+    "model": "purchase.order",
+    "record_id": 167,
+    "fields": [
+     "name",
+     "state",
+     "partner_id",
+     "pricelist_id",
+     "employee_id",
+     "user_id",
+     "company_id"
+    ]
+   },
+   "error_class": "invalid-field",
+   "error_head": "Error executing tool get_record: Connection error: Operation failed: Invalid field 'pricelist_id' in request",
+   "count": 1
+  },
+  {
+   "tool": "get_record",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "model": "daily_construction.report",
+    "record_id": 33,
+    "fields": [
+     "name",
+     "date",
+     "site_id",
+     "state",
+     "weather_condition",
+     "weather",
+     "detail_ids"
+    ]
+   },
+   "error_class": "invalid-field",
+   "error_head": "Error executing tool get_record: Connection error: Operation failed: Invalid field 'date' in request",
+   "count": 1
+  },
+  {
+   "tool": "get_record",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "model": "daily_construction.report",
+    "record_id": 33,
+    "fields": [
+     "weather",
+     "weather_am",
+     "weather_pm",
+     "temperature",
+     "equipment_ids",
+     "equipment_line_ids"
+    ]
+   },
+   "error_class": "invalid-field",
+   "error_head": "Error executing tool get_record: Connection error: Operation failed: Invalid field 'weather' in request",
+   "count": 1
+  },
+  {
+   "tool": "get_record",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "model": "daily_construction.report",
+    "record_id": 33,
+    "fields": [
+     "weather_data_id",
+     "equipment_line_ids",
+     "equipment_ids"
+    ]
+   },
+   "error_class": "invalid-field",
+   "error_head": "Error executing tool get_record: Connection error: Operation failed: Invalid field 'equipment_ids' in request",
+   "count": 1
+  },
+  {
+   "tool": "get_record",
+   "server": "odoo-production",
+   "args": {
+    "model": "solevo.ticket.mirror",
+    "record_id": 141,
+    "fields": [
+     "name",
+     "ticket_ref",
+     "claude_analysis",
+     "claude_duplicate_of",
+     "task_id",
+     "description",
+     "claude_severity",
+     "claude_module"
+    ]
+   },
+   "error_class": "invalid-field",
+   "error_head": "Error executing tool get_record: Connection error: Operation failed: Invalid field 'ticket_ref' in request",
+   "count": 1
+  },
+  {
+   "tool": "get_record",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "model": "hr.employee",
+    "record_id": 4,
+    "fields": [
+     "id",
+     "name",
+     "site_id"
+    ]
+   },
+   "error_class": "invalid-field",
+   "error_head": "Error executing tool get_record: Connection error: Operation failed: Invalid field 'site_id' in request",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "model": "foxlogik.questionnaire",
+    "domain": [
+     [
+      "is_requirement_checklist",
+      "=",
+      true
+     ]
+    ],
+    "fields": [
+     "id",
+     "title",
+     "active",
+     "formio_res_model_id"
+    ],
+    "limit": 10
+   },
+   "error_class": "invalid-field",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: Invalid field 'foxlogik.questionnaire.is_requirement_checklist' in request",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "model": "daily_construction.report",
+    "domain": [
+     [
+      "site_id",
+      "=",
+      6
+     ],
+     [
+      "date",
+      "=",
+      "2026-08-08"
+     ]
+    ],
+    "fields": [
+     "id",
+     "name",
+     "site_id",
+     "date"
+    ],
+    "limit": 5
+   },
+   "error_class": "invalid-field",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: Invalid field 'daily_construction.report.date' in request",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "model": "daily_construction.report",
+    "domain": "[[\"date\",\"=\",\"2026-08-13\"]]",
+    "fields": "[\"id\",\"name\",\"site_id\",\"date\",\"user_id\"]",
+    "limit": 20
+   },
+   "error_class": "invalid-field",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: Invalid field 'daily_construction.report.date' in request",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "model": "project.metric.capture",
+    "domain": "[]",
+    "fields": "[\"id\",\"name\",\"metric_id\"]",
+    "limit": 10
+   },
+   "error_class": "invalid-field",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: Invalid field 'metric_id' in request",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "model": "project.metric.capture",
+    "domain": "[[\"metric_id\",\"=\",14]]",
+    "fields": "[\"id\",\"name\",\"metric_id\"]",
+    "limit": 3
+   },
+   "error_class": "invalid-field",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: Invalid field 'project.metric.capture.metric_id' in request",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "model": "daily_construction.report",
+    "domain": "[[\"site_id\",\"=\",11],[\"date\",\"=\",\"2026-08-06\"]]",
+    "fields": "[\"id\",\"name\",\"date\",\"site_id\"]",
+    "limit": 5
+   },
+   "error_class": "invalid-field",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: Invalid field 'daily_construction.report.date' in request",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-production",
+   "args": {
+    "model": "sprint.task",
+    "domain": [
+     [
+      "date_end",
+      ">=",
+      "2026-08-06"
+     ]
+    ],
+    "fields": [
+     "id",
+     "name",
+     "date_start",
+     "date_end",
+     "project_id"
+    ],
+    "order": "date_start asc",
+    "limit": 10
+   },
+   "error_class": "invalid-field",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: Invalid field 'sprint.task.date_end' in request",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-production",
+   "args": {
+    "model": "hr.payslip",
+    "domain": [
+     [
+      "date_from",
+      ">=",
+      "2026-07-01"
+     ],
+     [
+      "date_to",
+      "<=",
+      "2026-07-31"
+     ]
+    ],
+    "fields": [
+     "name",
+     "employee_id",
+     "date_from",
+     "date_to",
+     "state",
+     "net_wage",
+     "line_ids"
+    ],
+    "limit": 20
+   },
+   "error_class": "invalid-field",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: Invalid field 'net_wage' in request",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-production",
+   "args": {
+    "model": "account.analytic.plan",
+    "domain": [],
+    "fields": [
+     "name",
+     "complete_name",
+     "parent_id",
+     "company_id"
+    ],
+    "limit": 30
+   },
+   "error_class": "invalid-field",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: Invalid field 'company_id' in request",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-production",
+   "args": {
+    "model": "solevo.support.ticket",
+    "domain": [
+     [
+      "name",
+      "ilike",
+      "00006"
+     ]
+    ],
+    "fields": [
+     "name",
+     "subject",
+     "description",
+     "ticket_type",
+     "module_id",
+     "partner_id",
+     "claude_analysis",
+     "claude_root_cause",
+     "claude_severity"
+    ],
+    "limit": 5
+   },
+   "error_class": "invalid-field",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: Invalid field 'solevo.support.ticket.name' in request",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-screenshot",
+   "args": {
+    "model": "project.project",
+    "domain": [
+     [
+      "allowed_internal_user_ids",
+      "in",
+      [
+       12
+      ]
+     ]
+    ],
+    "fields": [
+     "id",
+     "name"
+    ],
+    "limit": 50
+   },
+   "error_class": "invalid-field",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: Invalid field 'project.project.allowed_internal_user_ids' in request",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "model": "daily_construction.general_info",
+    "domain": [
+     [
+      "detail_id",
+      "=",
+      61
+     ],
+     [
+      "requirement_id",
+      "=",
+      6
+     ]
+    ],
+    "fields": [
+     "id",
+     "name",
+     "detail"
+    ],
+    "limit": 1
+   },
+   "error_class": "invalid-field",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: Invalid field 'daily_construction.general_info.detail_id' in request",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "model": "daily_construction.report",
+    "domain": [
+     [
+      "site_id",
+      "=",
+      11
+     ],
+     [
+      "date",
+      "=",
+      "2026-08-15"
+     ]
+    ],
+    "fields": [
+     "id",
+     "name",
+     "site_id",
+     "date"
+    ],
+    "limit": 5
+   },
+   "error_class": "invalid-field",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: Invalid field 'daily_construction.report.date' in request",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "model": "daily_construction.report",
+    "domain": [
+     [
+      "site_id",
+      "=",
+      6
+     ],
+     [
+      "date",
+      "=",
+      "2026-08-06"
+     ]
+    ],
+    "fields": [
+     "id",
+     "name",
+     "site_id",
+     "date"
+    ],
+    "limit": 5
+   },
+   "error_class": "invalid-field",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: Invalid field 'daily_construction.report.date' in request",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-s2f-prod",
+   "args": {
+    "model": "hr_timesheet_sheet.entry",
+    "domain": "[[\"employee_id\",\"=\",267]]",
+    "fields": "[\"id\",\"name\",\"date_start\",\"date_end\",\"product_ids\",\"state\"]",
+    "limit": 10
+   },
+   "error_class": "invalid-field",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: Invalid field 'date_start' in request",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-s2f-prod",
+   "args": {
+    "model": "hr_timesheet_sheet.entry",
+    "domain": "[[\"employee_id\",\"=\",267]]",
+    "fields": "[\"id\",\"name\",\"product_ids\",\"state\"]",
+    "limit": 10
+   },
+   "error_class": "invalid-field",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: Invalid field 'state' in request",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "model": "daily_construction.report",
+    "domain": [
+     [
+      "id",
+      "=",
+      33
+     ]
+    ],
+    "fields": [
+     "id",
+     "name",
+     "date",
+     "site_id"
+    ],
+    "limit": 1
+   },
+   "error_class": "invalid-field",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: Invalid field 'date' in request",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "model": "daily_construction.detail.line",
+    "domain": [
+     [
+      "id",
+      "in",
+      [
+       95,
+       96,
+       97
+      ]
+     ]
+    ],
+    "fields": [
+     "id",
+     "name",
+     "category_id",
+     "description",
+     "note"
+    ],
+    "limit": 10
+   },
+   "error_class": "invalid-field",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: Invalid field 'note' in request",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "model": "daily_construction.report",
+    "domain": [
+     [
+      "site_id",
+      "=",
+      10
+     ]
+    ],
+    "fields": [
+     "id",
+     "name",
+     "date",
+     "site_id"
+    ],
+    "order": "date desc",
+    "limit": 5
+   },
+   "error_class": "invalid-field",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: Invalid field 'date' in request",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "model": "daily_construction.detail",
+    "domain": [
+     [
+      "report_id",
+      "in",
+      [
+       55,
+       60
+      ]
+     ]
+    ],
+    "fields": [
+     "id",
+     "report_id",
+     "name"
+    ],
+    "limit": 20
+   },
+   "error_class": "invalid-field",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: Invalid field 'daily_construction.detail.report_id' in request",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "model": "daily_construction.detail.line",
+    "domain": [
+     [
+      "report_id",
+      "in",
+      [
+       55,
+       60
+      ]
+     ]
+    ],
+    "fields": [
+     "id",
+     "report_id",
+     "name"
+    ],
+    "limit": 20
+   },
+   "error_class": "invalid-field",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: Invalid field 'daily_construction.detail.line.report_id' in request",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-s2f-prod",
+   "args": {
+    "model": "project.teams.line",
+    "domain": "[[\"id\",\"in\",[627,603,21]]]",
+    "fields": "[\"project_id\",\"employee_id\"]",
+    "limit": 10
+   },
+   "error_class": "invalid-field",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: Invalid field 'employee_id' in request",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "model": "daily_construction.report",
+    "domain": [
+     [
+      "site_id",
+      "=",
+      6
+     ],
+     [
+      "date",
+      "=",
+      "2026-08-12"
+     ]
+    ],
+    "fields": [
+     "__all__"
+    ],
+    "limit": 5
+   },
+   "error_class": "invalid-field",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: Invalid field 'daily_construction.report.date' in request",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-production",
+   "args": {
+    "model": "sprint.task",
+    "domain": "[]",
+    "fields": "[\"id\",\"name\",\"release_id\"]",
+    "limit": 10
+   },
+   "error_class": "invalid-field",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: Invalid field 'release_id' in request",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "model": "daily_construction.report",
+    "domain": "[[\"site_id\",\"=\",10],[\"date\",\"=\",\"2026-08-14\"]]",
+    "fields": "[\"id\",\"name\",\"site_id\",\"date\"]",
+    "limit": 5
+   },
+   "error_class": "invalid-field",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: Invalid field 'daily_construction.report.date' in request",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "model": "daily_construction.report",
+    "domain": [
+     [
+      "site_id",
+      "=",
+      6
+     ],
+     [
+      "date",
+      "=",
+      "2026-08-14"
+     ]
+    ],
+    "fields": [
+     "id",
+     "name",
+     "site_id",
+     "date"
+    ]
+   },
+   "error_class": "invalid-field",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: Invalid field 'daily_construction.report.date' in request",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "model": "foxlogik.questionnaire",
+    "domain": [],
+    "fields": [
+     "id",
+     "name"
+    ],
+    "limit": 20
+   },
+   "error_class": "invalid-field",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: Invalid field 'name' in request",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "model": "daily_construction.report",
+    "domain": [
+     [
+      "model",
+      "=",
+      "daily_construction.report"
+     ],
+     [
+      "res_id",
+      "=",
+      53
+     ],
+     [
+      "message_type",
+      "=",
+      "comment"
+     ]
+    ],
+    "fields": [
+     "id",
+     "body",
+     "author_id",
+     "attachment_ids",
+     "date",
+     "include_in_report",
+     "report_detail_id"
+    ],
+    "order": "date asc",
+    "limit": 100
+   },
+   "error_class": "invalid-field",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: Invalid field 'daily_construction.report.model' in request",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-production",
+   "args": {
+    "model": "bpm.process.instance",
+    "domain": [
+     [
+      "id",
+      "in",
+      [
+       23,
+       27
+      ]
+     ]
+    ],
+    "fields": [
+     "name",
+     "state",
+     "process_id",
+     "res_id",
+     "error_message"
+    ],
+    "limit": 5
+   },
+   "error_class": "invalid-field",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: Invalid field 'error_message' in request",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-production",
+   "args": {
+    "model": "bpm.process.instance",
+    "domain": [
+     [
+      "id",
+      "in",
+      [
+       23,
+       27
+      ]
+     ]
+    ],
+    "fields": [
+     "name",
+     "state",
+     "res_id",
+     "timer_cron_ids",
+     "date_end"
+    ],
+    "limit": 5
+   },
+   "error_class": "invalid-field",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: Invalid field 'date_end' in request",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "__unparsedToolInput": {
+     "raw": "{\"model\": \"ir.model.fields\", \"domain\": [[\"model\", \"=\", \"claude.field.proposal\"], [\"name\", \"in\", [\"dcr_report_id\", \"bot_id\", \"reply_channel_id\", \"proposal_message_id\", \"model\", \"res_id\", \"state\"]], \"fields\": [\"name\", \"ttype\", \"relation\"], \"limit\": 20}",
+     "len": 250
+    }
+   },
+   "error_class": "json-unparseable",
+   "error_head": "<tool_use_error>InputValidationError: mcp__odoo-s2f-uat__search_records was called with input that could not be parsed as JSON. You sent (first 200 of 250 bytes): {\"model\": \"ir.model.fields\", \"domain\": [[\"model\", \"=\", \"claude.field.proposal",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-production",
+   "args": {
+    "__unparsedToolInput": {
+     "raw": "{\"model\": \"hr.payslip.line\", \"domain\": [[\"slip_id\", \"in\", [166,167,168,169,170,171]], [\"code\", \"in\", [\"GROSS\", \"BASIC\"]], \"fields\": [\"slip_id\", \"code\", \"name\", \"total\", \"amount\"], \"limit\": 30}",
+     "len": 192
+    }
+   },
+   "error_class": "json-unparseable",
+   "error_head": "<tool_use_error>InputValidationError: mcp__odoo-production__search_records was called with input that could not be parsed as JSON. You sent (first 192 of 192 bytes): {\"model\": \"hr.payslip.line\", \"domain\": [[\"slip_id\", \"in\", [166,167,168,169",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "__unparsedToolInput": {
+     "raw": "{\"model\": \"mail.message\", \"domain\": [[\"model\", \"=\", \"discuss.channel\"], [\"res_id\", 762 if false else 762]], \"fields\": [\"id\", \"body\", \"author_id\", \"attachment_ids\", \"date\", \"include_in_report\", \"report_detail_id\", \"message_type\"], \"order\": \"date desc\", \"limit\": 20}",
+     "len": 264
+    }
+   },
+   "error_class": "json-unparseable",
+   "error_head": "<tool_use_error>InputValidationError: mcp__odoo-s2f-uat__search_records was called with input that could not be parsed as JSON. You sent (first 200 of 264 bytes): {\"model\": \"mail.message\", \"domain\": [[\"model\", \"=\", \"discuss.channel\"], [\"res",
+   "count": 1
+  },
+  {
+   "tool": "call_method",
+   "server": "odoo-production",
+   "args": {
+    "model": "project.task",
+    "method": "message_fetch",
+    "args": "[[3624]]"
+   },
+   "error_class": "method-not-allowed",
+   "error_head": "Error executing tool call_method: Method 'message_fetch' is not callable on 'project.task' via call_method. Allowed methods for this model: none.",
+   "count": 1
+  },
+  {
+   "tool": "call_method",
+   "server": "odoo-production",
+   "args": {
+    "model": "ir.attachment",
+    "method": "read",
+    "args": "[[62445], [\"name\", \"mimetype\", \"datas\", \"description\"]]"
+   },
+   "error_class": "method-not-allowed",
+   "error_head": "Error executing tool call_method: Method 'read' is not callable on 'ir.attachment' via call_method. Allowed methods for this model: none.",
+   "count": 1
+  },
+  {
+   "tool": "get_record",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "model": "daily_construction.equipment.line",
+    "record_id": 4
+   },
+   "error_class": "model-missing",
+   "error_head": "Error executing tool get_record: Connection error: Operation failed: File, in xmlrpc_2 response = self._xmlrpc(service) file, in _xmlrpc result = dispatch_rpc(service, method, params) file, in dispatch_rpc return dispatch(method, params) fi",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-production",
+   "args": {
+    "model": "helpdesk.ticket",
+    "domain": [
+     [
+      "ticket_ref",
+      "=",
+      "TK-00003"
+     ]
+    ],
+    "fields": [
+     "name",
+     "description",
+     "partner_id",
+     "team_id",
+     "stage_id",
+     "ticket_type_id",
+     "priority"
+    ],
+    "limit": 3
+   },
+   "error_class": "model-missing",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: Object helpdesk.ticket doesn't exist",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-s2f-prod",
+   "args": {
+    "model": "questionnaire.checkitem.session",
+    "domain": [],
+    "fields": [
+     "id"
+    ],
+    "limit": 1
+   },
+   "error_class": "model-missing",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: Object questionnaire.checkitem.session doesn't exist",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-s2f-prod",
+   "args": {
+    "model": "fleet.vehicle",
+    "domain": [],
+    "fields": [
+     "id",
+     "name"
+    ],
+    "limit": 5
+   },
+   "error_class": "model-missing",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: File, in xmlrpc_2 response = self._xmlrpc(service) ^^^^^^^^^^^^^^^^^^^^^ file, in _xmlrpc result = dispatch_rpc(service, method, params) ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-s2f-prod",
+   "args": {
+    "model": "fleet.vehicle.model.brand",
+    "domain": [],
+    "fields": [
+     "id",
+     "name"
+    ],
+    "limit": 30
+   },
+   "error_class": "model-missing",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: File, in xmlrpc_2 response = self._xmlrpc(service) ^^^^^^^^^^^^^^^^^^^^^ file, in _xmlrpc result = dispatch_rpc(service, method, params) ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "model": "questionnaire.questionnaire",
+    "fields": [
+     "id",
+     "name"
+    ],
+    "limit": 20
+   },
+   "error_class": "model-missing",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: Object questionnaire.questionnaire doesn't exist",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-s2f-prod",
+   "args": {
+    "model": "project.team.line",
+    "domain": "[[\"id\",\"in\",[627,603,21]]]",
+    "fields": "[\"__all__\"]",
+    "limit": 10
+   },
+   "error_class": "model-missing",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: File, in xmlrpc_2 response = self._xmlrpc(service) ^^^^^^^^^^^^^^^^^^^^^ file, in _xmlrpc result = dispatch_rpc(service, method, params) ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-s2f-prod",
+   "args": {
+    "model": "fleet.vehicle.model.brand",
+    "domain": "[]",
+    "fields": "[\"id\",\"name\"]",
+    "limit": 80
+   },
+   "error_class": "model-missing",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: File, in xmlrpc_2 response = self._xmlrpc(service) ^^^^^^^^^^^^^^^^^^^^^ file, in _xmlrpc result = dispatch_rpc(service, method, params) ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-s2f-prod",
+   "args": {
+    "model": "fleet.vehicle",
+    "domain": "[]",
+    "fields": "[\"id\",\"name\",\"license_plate\",\"vin_sn\"]",
+    "limit": 30
+   },
+   "error_class": "model-missing",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: File, in xmlrpc_2 response = self._xmlrpc(service) ^^^^^^^^^^^^^^^^^^^^^ file, in _xmlrpc result = dispatch_rpc(service, method, params) ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "model": "questionnaire.questionnaire",
+    "domain": [],
+    "fields": [
+     "id",
+     "name"
+    ],
+    "limit": 20
+   },
+   "error_class": "model-missing",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: Object questionnaire.questionnaire doesn't exist",
+   "count": 1
+  },
+  {
+   "tool": "get_record",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "model": "claude.field.proposal",
+    "record_id": 614,
+    "fields": [
+     "__all__"
+    ]
+   },
+   "error_class": "record-missing",
+   "error_head": "Error executing tool get_record: Record not found: claude.field.proposal with ID 614",
+   "count": 1
+  },
+  {
+   "tool": "get_record",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "model": "claude.field.proposal",
+    "record_id": 616,
+    "fields": [
+     "id",
+     "state",
+     "error_message",
+     "audit_log",
+     "write_date"
+    ]
+   },
+   "error_class": "record-missing",
+   "error_head": "Error executing tool get_record: Record not found: claude.field.proposal with ID 616",
+   "count": 1
+  },
+  {
+   "tool": "get_record",
+   "server": "odoo-production",
+   "args": {
+    "model": "claude.field.proposal",
+    "record_id": 218,
+    "fields": [
+     "state",
+     "model",
+     "res_id",
+     "reply_channel_id",
+     "error_message",
+     "bot_id",
+     "is_followup",
+     "followup_depth",
+     "create_date",
+     "write_date"
+    ]
+   },
+   "error_class": "record-missing",
+   "error_head": "Error executing tool get_record: Record not found: claude.field.proposal with ID 218",
+   "count": 1
+  },
+  {
+   "tool": "get_record",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "model": "questionnaire.checkitem.session",
+    "record_id": 14,
+    "fields": [
+     "pending_count",
+     "activity_count",
+     "complete"
+    ]
+   },
+   "error_class": "record-missing",
+   "error_head": "Error executing tool get_record: Record not found: questionnaire.checkitem.session with ID 14",
+   "count": 1
+  },
+  {
+   "tool": "get_record",
+   "server": "odoo-s2f-prod",
+   "args": {
+    "model": "foxlogik.report",
+    "record_id": 43,
+    "fields": [
+     "__all__"
+    ]
+   },
+   "error_class": "record-missing",
+   "error_head": "Error executing tool get_record: Record not found: foxlogik.report with ID 43",
+   "count": 1
+  },
+  {
+   "tool": "get_fields",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "model": "hr.employee"
+   },
+   "error_class": "response-too-large",
+   "error_head": "Error: result (56,255 characters) exceeds maximum allowed tokens. Output has been saved to /Users/claude/.claude/projects/-Users-Shared-claude-foxlogik/554d7f1a-bd78-4b78-8584-90de2ec71714/tool-results/mcp-odoo-s2f-uat-get_fields-1786628828",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-production",
+   "args": {
+    "model": "ir.ui.view",
+    "domain": [
+     [
+      "inherit_id.model",
+      "=",
+      "project.project"
+     ],
+     [
+      "inherit_id.name",
+      "=",
+      "project_control.project.form"
+     ]
+    ],
+    "fields": [
+     "name",
+     "xml_id",
+     "active",
+     "arch_db",
+     "priority"
+    ],
+    "limit": 40
+   },
+   "error_class": "response-too-large",
+   "error_head": "<persisted-output> Output too large (49.4KB). Full output saved to: /Users/claude/.claude/projects/-Users-Shared-claude-foxlogik/1b13fe85-0cc9-4f8b-a862-0f8016cb2b93/tool-results/toolu_01XjKcqxMWDqSRNiBDve8heC.txt Preview (first 2KB): {\"rec",
+   "count": 1
+  },
+  {
+   "tool": "create_record",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "model": "drp.equipment_infrastructure",
+    "values": {
+     "report_id": 59,
+     "name": "Hart meter",
+     "type": "equipment",
+     "quantity": 2
+    }
+   },
+   "error_class": "sanitizer-dump",
+   "error_head": "Error executing tool create_record: Connection error: Operation failed: File, in xmlrpc_2 response = self._xmlrpc(service) file, in _xmlrpc result = dispatch_rpc(service, method, params) file, in dispatch_rpc return dispatch(method, params)",
+   "count": 1
+  },
+  {
+   "tool": "get_defaults",
+   "server": "odoo-s2f-prod",
+   "args": {
+    "model": "product.supplierinfo",
+    "fields": [
+     "currency_id",
+     "delay",
+     "min_qty",
+     "price"
+    ]
+   },
+   "error_class": "sanitizer-dump",
+   "error_head": "Error executing tool get_defaults: Connection error: Operation failed: File, in xmlrpc_2 response = self._xmlrpc(service) ^^^^^^^^^^^^^^^^^^^^^ file, in _xmlrpc return xmlrpc.client.dumps((result,), methodresponse=1, allow_none=False) ^^^^^",
+   "count": 1
+  },
+  {
+   "tool": "get_record",
+   "server": "odoo-s2f-prod",
+   "args": {
+    "model": "purchase.order",
+    "record_id": 167,
+    "fields": [
+     "__all__"
+    ]
+   },
+   "error_class": "sanitizer-dump",
+   "error_head": "Error executing tool get_record: Connection error: Operation failed: File, in xmlrpc_2 response = self._xmlrpc(service) ^^^^^^^^^^^^^^^^^^^^^ file, in _xmlrpc result = dispatch_rpc(service, method, params) ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
+   "count": 1
+  },
+  {
+   "tool": "get_record",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "model": "daily_construction.report",
+    "record_id": 33,
+    "fields": [
+     "__all__"
+    ]
+   },
+   "error_class": "sanitizer-dump",
+   "error_head": "Error executing tool get_record: Connection error: Operation failed: File, in xmlrpc_2 response = self._xmlrpc(service) file, in _xmlrpc result = dispatch_rpc(service, method, params) file, in dispatch_rpc return dispatch(method, params) fi",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-s2f-prod",
+   "args": {
+    "model": "template.hr_timesheet_sheet.entry.line",
+    "domain": "[[\"id\",\"in\",[1346,1347,1342,1348,1343,1344,1345,5273]]]",
+    "fields": "[\"__all__\"]",
+    "limit": 20
+   },
+   "error_class": "sanitizer-dump",
+   "error_head": "Error executing tool search_records: Connection error: Operation failed: File, in xmlrpc_2 response = self._xmlrpc(service) ^^^^^^^^^^^^^^^^^^^^^ file, in _xmlrpc result = dispatch_rpc(service, method, params) ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
+   "count": 1
+  },
+  {
+   "tool": "update_record",
+   "server": "odoo-production",
+   "args": {
+    "model": "project.task",
+    "record_id": 3682,
+    "values": {
+     "claude_status": "waiting-confirm",
+     "claude_confirm_requested": "2026-08-18T22:10:00",
+     "claude_last_run": false
+    }
+   },
+   "error_class": "sanitizer-dump",
+   "error_head": "Error executing tool update_record: Connection error: Operation failed: File, in xmlrpc_2 response = self._xmlrpc(service) ^^^^^^^^^^^^^^^^^^^^^ file, in _xmlrpc result = dispatch_rpc(service, method, params) ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
+   "count": 1
+  },
+  {
+   "tool": "update_record",
+   "server": "odoo-production",
+   "args": {
+    "model": "project.task",
+    "record_id": 3612,
+    "values": {
+     "claude_status": "waiting-confirm",
+     "claude_confirm_requested": "2026-08-15T13:20:00",
+     "claude_last_run": false
+    }
+   },
+   "error_class": "sanitizer-dump",
+   "error_head": "Error executing tool update_record: Connection error: Operation failed: File, in xmlrpc_2 response = self._xmlrpc(service) ^^^^^^^^^^^^^^^^^^^^^ file, in _xmlrpc result = dispatch_rpc(service, method, params) ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
+   "count": 1
+  },
+  {
+   "tool": "aggregate_records",
+   "server": "odoo-s2f-prod",
+   "args": {
+    "model": "tci",
+    "domain": "[[\"so_id\",\"=\",193]]",
+    "groupby": "[\"tci_type\"]",
+    "fields": "[\"total_amount\"]"
+   },
+   "error_class": "tool-missing",
+   "error_head": "<tool_use_error>Error: No such tool available: mcp__odoo-s2f-prod__aggregate_records</tool_use_error>",
+   "count": 1
+  },
+  {
+   "tool": "get_record",
+   "server": "odoo-s2f-prod",
+   "args": {
+    "model": "purchase.order",
+    "res_id": "166"
+   },
+   "error_class": "tool-missing",
+   "error_head": "<tool_use_error>Error: No such tool available: mcp__odoo-s2f-prod__get_record</tool_use_error>",
+   "count": 1
+  },
+  {
+   "tool": "get_record",
+   "server": "odoo-s2f-prod",
+   "args": {
+    "model": "ir.ui.menu",
+    "record_id": "273",
+    "fields": "[\"id\", \"name\", \"complete_name\", \"parent_id\"]"
+   },
+   "error_class": "tool-missing",
+   "error_head": "<tool_use_error>Error: No such tool available: mcp__odoo-s2f-prod__get_record</tool_use_error>",
+   "count": 1
+  },
+  {
+   "tool": "get_record",
+   "server": "odoo-s2f-prod",
+   "args": {
+    "model": "project.task",
+    "record_id": "991",
+    "fields": "[\"id\", \"name\", \"rep_uid\", \"rep_name\", \"rep_uid_type\", \"po_id\", \"po_line_id\", \"vendor_id\", \"employee_id\"]"
+   },
+   "error_class": "tool-missing",
+   "error_head": "<tool_use_error>Error: No such tool available: mcp__odoo-s2f-prod__get_record</tool_use_error>",
+   "count": 1
+  },
+  {
+   "tool": "odoo-s2f-uat",
+   "server": "odoo-s2f-uat",
+   "args": {},
+   "error_class": "tool-missing",
+   "error_head": "<tool_use_error>Error: No such tool available: mcp__odoo-s2f-uat</tool_use_error>",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-s2f-prod",
+   "args": {
+    "model": "product.supplierinfo",
+    "domain": "[[\"product_tmpl_id\", \"=\", 3902], [\"partner_id\", \"=\", 1795]]",
+    "fields": "[\"id\", \"partner_id\", \"price\", \"state\"]",
+    "limit": "10"
+   },
+   "error_class": "tool-missing",
+   "error_head": "<tool_use_error>Error: No such tool available: mcp__odoo-s2f-prod__search_records</tool_use_error>",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "model": "daily_construction.report",
+    "domain": "[[\"site_id\", \"=\", 9]]",
+    "fields": "[\"id\", \"name\", \"date\", \"site_id\"]",
+    "limit": "5"
+   },
+   "error_class": "tool-missing",
+   "error_head": "<tool_use_error>Error: No such tool available: mcp__odoo-s2f-uat__search_records</tool_use_error>",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-production",
+   "args": {
+    "model": "prospecting.role.tag",
+    "domain": "[[\"name\", \"in\", [\"Owner\", \"President\", \"VP Operations\", \"COO\", \"Project Manager\", \"Purchasing Manager\", \"Business Development Manager\"]]]",
+    "fields": "[\"name\"]",
+    "limit": "10"
+   },
+   "error_class": "tool-missing",
+   "error_head": "<tool_use_error>Error: No such tool available: mcp__odoo-production__search_records</tool_use_error>",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "model": "hr.employee",
+    "domain": [
+     [
+      "name",
+      "ilike",
+      "Alanna Byblow"
+     ]
+    ],
+    "fields": [
+     "id",
+     "name"
+    ]
+   },
+   "error_class": "transport",
+   "error_head": "Error executing tool search_records: Connection error: Operation timeout after 30 seconds",
+   "count": 1
+  },
+  {
+   "tool": "search_records",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "model": "res.users",
+    "domain": [
+     [
+      "id",
+      "=",
+      6
+     ]
+    ],
+    "fields": [
+     "id"
+    ],
+    "limit": 1
+   },
+   "error_class": "transport",
+   "error_head": "Error executing tool search_records: Connection error: Operation timeout after 30 seconds",
+   "count": 1
+  },
+  {
+   "tool": "create_record",
+   "server": "odoo-s2f-uat",
+   "args": {
+    "model": "questionnaire.checkitem.session",
+    "values": {
+     "questionnaire_id": null,
+     "res_model": "daily_construction.detail",
+     "res_id": 70
+    }
+   },
+   "error_class": "unclassified",
+   "error_head": "Error executing tool create_record: Connection error: Operation failed: The operation cannot be completed: - Create/update: a mandatory field is not set. - Delete: another model requires the record being deleted. If possible, archive it ins",
+   "count": 1
+  },
+  {
+   "tool": "list_resource_templates",
+   "server": "odoo-screenshot",
+   "args": {},
+   "error_class": "unclassified",
+   "error_head": "{\"templates\":[{\"uri_template\":\"odoo://{model}/record/{record_id}\",\"description\":\"Get a specific record by ID\",\"parameters\":{\"model\":\"Odoo model name (e.g., res.partner)\",\"record_id\":\"Record ID (e.g., 10)\"},\"example\":\"odoo://res.partner/reco",
+   "count": 1
+  }
+ ]
+}

@@ -6,6 +6,7 @@ actions like creating, updating, or deleting records.
 """
 
 import json
+import re
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
@@ -21,6 +22,12 @@ from .error_handling import (
 from .error_sanitizer import ErrorSanitizer
 from .logging_config import get_logger, perf_logger
 from .odoo_connection import OdooConnection, OdooConnectionError
+from .schema_guard import (
+    SchemaGuardError,
+    domain_field_names,
+    normalize_domain,
+    validate_fields,
+)
 from .schemas import (
     AccessCheckResult,
     CallMethodResult,
@@ -122,6 +129,93 @@ class OdooToolHandler:
                 )
             return pinned
         return user_id
+
+    def _resolve_record_id(
+        self, record_id: Optional[int], res_id: Optional[int]
+    ) -> int:
+        """Accept res_id as an alias for record_id.
+
+        Callers that have just been reading chatter carry Odoo's own naming
+        across: mail.message, ir.attachment and every other pointer model spell
+        this res_id, so the alias arrives on get_record often enough to be worth
+        honouring. Rejected in production by argument validation, before the call
+        reached Odoo at all, so accepting it changes no successful behaviour.
+        """
+        if record_id is not None and res_id is not None and record_id != res_id:
+            raise ValidationError(
+                f"record_id ({record_id}) and res_id ({res_id}) disagree. "
+                f"Pass one; res_id is accepted as an alias for record_id."
+            )
+        resolved = record_id if record_id is not None else res_id
+        if resolved is None:
+            raise ValidationError("record_id is required (res_id is accepted as an alias).")
+        return resolved
+
+    def _schema_for(self, model: str, user_id: Optional[int] = None) -> Optional[Dict[str, Any]]:
+        """Cached field definitions for *model*, or None when unavailable.
+
+        Never raises: the guards that consume this fail open, because an
+        unreadable schema is not evidence that the caller got the field wrong.
+        """
+        try:
+            return self._fields_get_for(model, user_id)
+        except Exception:  # noqa: BLE001 — advisory only, must never fail a call
+            logger.debug("Field definitions unavailable for %s; skipping field validation", model)
+            return None
+
+    def _guard_domain(self, model: str, domain: Any) -> Any:
+        """Normalize a domain, converting a guard rejection into ValidationError."""
+        try:
+            return normalize_domain(domain, model=model)
+        except SchemaGuardError as e:
+            raise ValidationError(str(e)) from e
+
+    def _guard_fields(
+        self,
+        model: str,
+        requested: Optional[List[str]],
+        user_id: Optional[int] = None,
+        context: str = "fields",
+        extra: Optional[List[str]] = None,
+    ) -> None:
+        """Reject unknown field names before the RPC, naming the closest real ones."""
+        names = list(requested or [])
+        if extra:
+            names += extra
+        if not names:
+            return
+        schema = self._schema_for(model, user_id=user_id)
+        try:
+            validate_fields(model, names, schema, context=context)
+        except SchemaGuardError as e:
+            raise ValidationError(str(e)) from e
+
+    @staticmethod
+    def _access_hint(model: str, fields: Any, message: str) -> str:
+        """Append the missing next step to an Odoo access refusal.
+
+        Odoo names the groups but not the remedy, and when the refusal came from
+        a relational field pulled in by ``fields=["__all__"]`` it names a model
+        the caller never asked for — which reads as "this record is unreadable"
+        when the record is perfectly readable with an explicit field list.
+        """
+        if "not allowed to access" not in message and "access" not in message.lower():
+            return message
+
+        wants_all = fields == ["__all__"] or fields == "__all__"
+        blocked = re.search(r"\(([a-z_][a-z0-9_.]*\.[a-z0-9_.]+)\)", message)
+        other_model = blocked.group(1) if blocked and blocked.group(1) != model else None
+
+        if wants_all and other_model:
+            return (
+                f"{message} This refusal came from '{other_model}', pulled in by "
+                f'fields=["__all__"] on {model}. Retry with an explicit field list to read '
+                f"{model} without it."
+            )
+        return (
+            f"{message} Retrying with the same arguments will fail identically — "
+            f"request the missing group, or read a model you have access to."
+        )
 
     def _format_datetime(self, value: str) -> str:
         """Format datetime values to ISO 8601 with timezone."""
@@ -487,9 +581,10 @@ class OdooToolHandler:
         )
         async def get_record(
             model: str,
-            record_id: int,
+            record_id: Optional[int] = None,
             fields: Optional[List[str]] = None,
             user_id: Optional[int] = None,
+            res_id: Optional[int] = None,
             ctx: Optional[Context] = None,
         ) -> RecordResult:
             """Get a specific record by ID with smart field selection.
@@ -500,6 +595,9 @@ class OdooToolHandler:
             Args:
                 model: The Odoo model name (e.g., 'res.partner')
                 record_id: The record ID
+                res_id: Accepted as an alias for record_id (Odoo names this field
+                    res_id on mail.message and other pointer models, and callers
+                    working with chatter routinely carry that name across)
                 fields: Field selection options:
                     - None (default): Returns smart selection of common fields
                     - ["field1", "field2", ...]: Returns only specified fields
@@ -529,7 +627,11 @@ class OdooToolHandler:
                 includes metadata with field statistics.
             """
             return await self._handle_get_record_tool(
-                model, record_id, fields, ctx, user_id=self._effective_user_id(user_id)
+                model,
+                self._resolve_record_id(record_id, res_id),
+                fields,
+                ctx,
+                user_id=self._effective_user_id(user_id),
             )
 
         @self.app.tool(
@@ -616,17 +718,19 @@ class OdooToolHandler:
         )
         async def update_record(
             model: str,
-            record_id: int,
             values: Dict[str, Any],
+            record_id: Optional[int] = None,
             user_id: Optional[int] = None,
+            res_id: Optional[int] = None,
             ctx: Optional[Context] = None,
         ) -> UpdateResult:
             """Update an existing record.
 
             Args:
                 model: The Odoo model name (e.g., 'res.partner')
-                record_id: The record ID to update
                 values: Field values to update
+                record_id: The record ID to update
+                res_id: Accepted as an alias for record_id
                 user_id: Optional Odoo user ID. When provided the write runs
                     under that user's security context. Requires the
                     foxlogik_mcp_proxy module to be installed.
@@ -635,7 +739,11 @@ class OdooToolHandler:
                 Updated record details with confirmation.
             """
             result = await self._handle_update_record_tool(
-                model, record_id, values, ctx, user_id=self._effective_user_id(user_id)
+                model,
+                self._resolve_record_id(record_id, res_id),
+                values,
+                ctx,
+                user_id=self._effective_user_id(user_id),
             )
             return UpdateResult(**result)
 
@@ -650,8 +758,9 @@ class OdooToolHandler:
         )
         async def delete_record(
             model: str,
-            record_id: int,
+            record_id: Optional[int] = None,
             user_id: Optional[int] = None,
+            res_id: Optional[int] = None,
             ctx: Optional[Context] = None,
         ) -> DeleteResult:
             """Delete a record.
@@ -659,6 +768,7 @@ class OdooToolHandler:
             Args:
                 model: The Odoo model name (e.g., 'res.partner')
                 record_id: The record ID to delete
+                res_id: Accepted as an alias for record_id
                 user_id: Optional Odoo user ID. When provided the delete runs
                     under that user's security context. Requires the
                     foxlogik_mcp_proxy module to be installed.
@@ -667,7 +777,10 @@ class OdooToolHandler:
                 Deletion confirmation with the deleted record's name and ID.
             """
             result = await self._handle_delete_record_tool(
-                model, record_id, ctx, user_id=self._effective_user_id(user_id)
+                model,
+                self._resolve_record_id(record_id, res_id),
+                ctx,
+                user_id=self._effective_user_id(user_id),
             )
             return DeleteResult(**result)
 
@@ -917,6 +1030,17 @@ class OdooToolHandler:
                                 f"Invalid fields parameter. Expected JSON array or Python list, got: {fields[:100]}..."
                             ) from e
 
+                # Validate locally, before the RPC. Odoo answers a malformed leaf
+                # with an unpack ValueError and an unknown field with a stack
+                # trace; neither names the fix, so the caller repeats the mistake.
+                parsed_domain = self._guard_domain(model, parsed_domain)
+                self._guard_fields(
+                    model,
+                    parsed_fields if isinstance(parsed_fields, list) else None,
+                    user_id=user_id,
+                    extra=domain_field_names(parsed_domain),
+                )
+
                 # Set defaults
                 if limit <= 0 or limit > self.config.max_limit:
                     limit = self.config.default_limit
@@ -987,9 +1111,9 @@ class OdooToolHandler:
                 }
 
         except AccessControlError as e:
-            raise ValidationError(f"Access denied: {e}") from e
+            raise ValidationError(self._access_hint(model, fields, f"Access denied: {e}")) from e
         except OdooConnectionError as e:
-            raise ValidationError(f"Connection error: {e}") from e
+            raise ValidationError(self._access_hint(model, fields, f"Connection error: {e}")) from e
         except Exception as e:
             logger.error(f"Error in search_records tool: {e}")
             sanitized_msg = ErrorSanitizer.sanitize_message(str(e))
@@ -1035,6 +1159,7 @@ class OdooToolHandler:
                     logger.debug(f"Fetching all fields for {model}")
                 else:
                     # Specific fields requested
+                    self._guard_fields(model, fields, user_id=user_id)
                     logger.debug(f"Fetching specific fields for {model}: {fields}")
 
                 # Read the record
@@ -1074,9 +1199,9 @@ class OdooToolHandler:
         except NotFoundError as e:
             raise ValidationError(str(e)) from e
         except AccessControlError as e:
-            raise ValidationError(f"Access denied: {e}") from e
+            raise ValidationError(self._access_hint(model, fields, f"Access denied: {e}")) from e
         except OdooConnectionError as e:
-            raise ValidationError(f"Connection error: {e}") from e
+            raise ValidationError(self._access_hint(model, fields, f"Connection error: {e}")) from e
         except Exception as e:
             logger.error(f"Error in get_record tool: {e}")
             sanitized_msg = ErrorSanitizer.sanitize_message(str(e))
@@ -1450,6 +1575,9 @@ class OdooToolHandler:
                 if not values:
                     raise ValidationError("No values provided for record creation")
 
+                # Reject unknown field names before the write, naming the real ones.
+                self._guard_fields(model, list(values.keys()), user_id=user_id, context="value fields")
+
                 # Create the record
                 if user_id is not None:
                     record_id = self.connection.execute_kw_as_user(
@@ -1520,6 +1648,9 @@ class OdooToolHandler:
                 # Validate input
                 if not values:
                     raise ValidationError("No values provided for record update")
+
+                # Reject unknown field names before the write, naming the real ones.
+                self._guard_fields(model, list(values.keys()), user_id=user_id, context="value fields")
 
                 # Check if record exists (only fetch ID to verify existence)
                 if user_id is not None:

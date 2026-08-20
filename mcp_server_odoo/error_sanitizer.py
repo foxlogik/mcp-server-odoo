@@ -5,8 +5,28 @@ returned to users, removing internal implementation details while maintaining
 useful information for debugging.
 """
 
+import os
 import re
 from typing import Any, Dict, Optional
+
+# A traceback that has had its file paths and line numbers stripped is not a
+# sanitized error — it is the same forty frames with the useful parts removed.
+# Production callers received an average of 1,400 characters of `dispatch_rpc` /
+# `execute_kw` frames with the one sentence that named the problem at the very
+# end, and acted on the frames. Detect that shape and keep only the tail.
+_TRACEBACK_MARKERS = (
+    "Traceback (most recent call last)",
+    "dispatch_rpc",
+    "execute_kw",
+    'File "',
+)
+
+_EXCEPTION_LINE = re.compile(
+    r"^(?P<type>[A-Za-z_][\w.]*(?:Error|Exception|Warning|Fault|Exit|Interrupt))"
+    r"\s*:\s*(?P<message>.*)$"
+)
+
+_DEBUG_TRACES_ENV = "ODOO_MCP_DEBUG_TRACES"
 
 
 class ErrorSanitizer:
@@ -74,6 +94,12 @@ class ErrorSanitizer:
         if not message:
             return "An error occurred"
 
+        # Collapse a traceback to its final exception line before anything else.
+        # The tail still goes through the mappings below, so an "Invalid field"
+        # buried in a stack is reported exactly as one arriving on its own.
+        tail = cls.extract_exception_tail(message)
+        message = tail if tail else message
+
         sanitized = message
 
         # First, try to match against known error patterns
@@ -106,6 +132,27 @@ class ErrorSanitizer:
             sanitized = sanitized[0].upper() + sanitized[1:]
 
         return sanitized
+
+    @classmethod
+    def extract_exception_tail(cls, message: str) -> Optional[str]:
+        """Return the final ``ExcType: message`` line of a traceback, if any.
+
+        Returns None when *message* is not traceback-shaped, or when
+        ODOO_MCP_DEBUG_TRACES is set — full frames stay available for debugging,
+        they just stop being the default answer to a caller.
+        """
+        if not message or os.environ.get(_DEBUG_TRACES_ENV):
+            return None
+        if not any(marker in message for marker in _TRACEBACK_MARKERS):
+            return None
+
+        for line in reversed([ln.strip() for ln in message.splitlines() if ln.strip()]):
+            match = _EXCEPTION_LINE.match(line)
+            if match:
+                exception_type = match.group("type").rsplit(".", 1)[-1]
+                detail = match.group("message").strip()
+                return f"{exception_type}: {detail}" if detail else exception_type
+        return None
 
     @classmethod
     def _extract_relevant_info(cls, message: str, pattern: str) -> Optional[str]:
@@ -214,6 +261,14 @@ class ErrorSanitizer:
             Sanitized error message
         """
         # Common Odoo XML-RPC faults
+        if "Only system administrators may use MCP user impersonation" in fault_string:
+            # The bare policy statement gave the caller no exit, and it was
+            # retried verbatim twelve times in one production window.
+            return (
+                "This connection may not impersonate another user: user_id is "
+                "restricted to system administrators. Retry without user_id to run "
+                "as the service account."
+            )
         if "Access Denied" in fault_string:
             return "Access denied: Invalid credentials or insufficient permissions"
         elif "Object does not exist" in fault_string:
