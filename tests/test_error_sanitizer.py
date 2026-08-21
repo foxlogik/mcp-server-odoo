@@ -162,3 +162,61 @@ class TestErrorSanitizer:
 
         # Should contain useful information
         assert "Invalid field" in sanitized
+
+
+class TestNewlineFreeAndPsycopgTails:
+    """Both bugs that let a 1600-character traceback reach a supervisor's phone.
+
+    An Odoo XML-RPC fault string arrives with its newlines already collapsed to
+    spaces, and psycopg2's exception names end in neither "Error" nor
+    "Exception". Either one alone defeats the tail extractor; together they made
+    every database-schema failure opaque.
+    """
+
+    REAL = (
+        "File, in xmlrpc_2 response = self._xmlrpc(service) file, in _xmlrpc "
+        "result = dispatch_rpc(service, method, params) file, in execute_kw "
+        "return execute(db, uid, obj, method, *args, **kw or {}) "
+        'File "<decorator-gen-503>", in create file, in _model_create_multi '
+        "return create(self, [arg]) file, in _get_or_create_metric_capture "
+        '"project_id": self.site_id.main_project_id.id, file, in execute '
+        "res = self._obj.execute(query, params) "
+        "psycopg2.errors.UndefinedColumn: column "
+        "site_management_site.weather_display_type does not exist "
+        'LINE 1: ..., "site_management_site"."display_weather_graph", "site_mana... ^'
+    )
+
+    def test_collapses_the_real_payload(self):
+        assert ErrorSanitizer.extract_exception_tail(self.REAL) == (
+            "UndefinedColumn: column site_management_site.weather_display_type "
+            "does not exist"
+        )
+
+    def test_sql_echo_and_caret_are_dropped(self):
+        tail = ErrorSanitizer.extract_exception_tail(self.REAL)
+        assert "LINE 1" not in tail
+        assert not tail.endswith("^")
+
+    def test_dotted_psycopg_type_is_recognised_with_newlines_too(self):
+        assert ErrorSanitizer.extract_exception_tail(
+            'Traceback (most recent call last):\n  File "x.py", line 1\n'
+            "psycopg2.errors.NotNullViolation: null value in column \"name\""
+        ) == 'NotNullViolation: null value in column "name"'
+
+    def test_last_exception_wins_when_several_appear(self):
+        # Frames can quote an earlier exception; the one the traceback ended on
+        # is the cause.
+        assert ErrorSanitizer.extract_exception_tail(
+            "file, in dispatch_rpc raise ValueError: inner "
+            "file, in execute_kw psycopg2.errors.UndefinedTable: relation x does not exist"
+        ) == "UndefinedTable: relation x does not exist"
+
+    def test_call_frames_are_not_mistaken_for_exceptions(self):
+        # odoo.api.call_kw is a dotted path too — lowercase after the last dot is
+        # what keeps the dotted branch from matching it.
+        assert ErrorSanitizer.extract_exception_tail(
+            "file, in dispatch_rpc\nfile, in odoo.api.call_kw: recs, method"
+        ) is None
+
+    def test_non_traceback_text_still_passes_through(self):
+        assert ErrorSanitizer.extract_exception_tail("Invalid field 'date' in request") is None
