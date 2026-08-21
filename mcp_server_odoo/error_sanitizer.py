@@ -21,10 +21,37 @@ _TRACEBACK_MARKERS = (
     'File "',
 )
 
+# An exception type is either a bare name with a conventional suffix
+# (ValidationError, AccessError) or a dotted path ending in a CamelCase class —
+# psycopg2 raises psycopg2.errors.UndefinedColumn, whose name ends in neither
+# "Error" nor "Exception", so a suffix list alone silently misses every database
+# schema failure. The dotted branch requires an uppercase initial after the last
+# dot, which is what keeps it from matching call frames like odoo.api.call_kw.
+_EXCEPTION_TYPE = (
+    r"(?:[A-Za-z_][\w]*\.)+[A-Z][\w]*"
+    r"|[A-Za-z_][\w.]*(?:Error|Exception|Warning|Fault|Exit|Interrupt)"
+)
+
 _EXCEPTION_LINE = re.compile(
-    r"^(?P<type>[A-Za-z_][\w.]*(?:Error|Exception|Warning|Fault|Exit|Interrupt))"
+    r"^(?P<type>" + _EXCEPTION_TYPE + r")"
     r"\s*:\s*(?P<message>.*)$"
 )
+
+# For tracebacks that arrive with their newlines already collapsed to spaces —
+# the shape Odoo's XML-RPC fault strings actually have by the time they reach a
+# caller. Without this the line scan sees one line beginning "File, in xmlrpc_2"
+# and reports no exception at all.
+#
+# Only the TYPE and its colon are matched here, never the message: a pattern
+# ending in ".*$" is greedy, so its first match swallows every later exception
+# line and finditer then finds nothing after it — which silently returns the
+# EARLIEST exception, the opposite of what a traceback tail means. Positions
+# first, then read the message from the last one.
+_EXCEPTION_ANYWHERE = re.compile(r"(?:" + _EXCEPTION_TYPE + r")\s*:\s*")
+
+# psycopg2 appends the offending SQL and a caret to its message. Useful in a
+# server log, noise in a one-line answer, and it hides the real sentence.
+_SQL_ECHO = re.compile(r"\s*LINE\s+\d+:.*$", re.DOTALL)
 
 _DEBUG_TRACES_ENV = "ODOO_MCP_DEBUG_TRACES"
 
@@ -149,10 +176,22 @@ class ErrorSanitizer:
         for line in reversed([ln.strip() for ln in message.splitlines() if ln.strip()]):
             match = _EXCEPTION_LINE.match(line)
             if match:
-                exception_type = match.group("type").rsplit(".", 1)[-1]
-                detail = match.group("message").strip()
-                return f"{exception_type}: {detail}" if detail else exception_type
-        return None
+                return cls._format_exception_tail(match)
+
+        # Newline-free traceback: keep the LAST type position, which is the
+        # exception the frames above it led to, and read from there.
+        starts = [m.start() for m in _EXCEPTION_ANYWHERE.finditer(message)]
+        if not starts:
+            return None
+        match = _EXCEPTION_LINE.match(message[starts[-1]:].strip())
+        return cls._format_exception_tail(match) if match else None
+
+    @staticmethod
+    def _format_exception_tail(match: "re.Match") -> str:
+        """Render one matched exception line as ``ShortType: message``."""
+        exception_type = match.group("type").rsplit(".", 1)[-1]
+        detail = _SQL_ECHO.sub("", match.group("message")).strip().rstrip("^").strip()
+        return f"{exception_type}: {detail}" if detail else exception_type
 
     @classmethod
     def _extract_relevant_info(cls, message: str, pattern: str) -> Optional[str]:
