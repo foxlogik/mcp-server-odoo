@@ -827,9 +827,11 @@ class OdooToolHandler:
                 partner_ids: Partner IDs to notify — the @mention recipients.
                 attachment_ids: IDs of existing ir.attachment records to attach.
                 author_id: Partner ID to post as. Defaults to the calling user's
-                    partner.
+                    partner. Posting under another partner's name requires the
+                    connection user to be an Odoo system administrator.
                 user_id: Optional Odoo user ID to post as. Requires the
-                    foxlogik_mcp_proxy module.
+                    foxlogik_mcp_proxy module, and a system-administrator
+                    connection user.
 
             Returns:
                 Confirmation carrying the created message's ID.
