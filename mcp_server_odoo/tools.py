@@ -37,6 +37,7 @@ from .schemas import (
     FieldSelectionMetadata,
     FieldsResult,
     ModelsResult,
+    PostMessageResult,
     RecordResult,
     ResourceTemplatesResult,
     SearchResult,
@@ -783,6 +784,70 @@ class OdooToolHandler:
                 user_id=self._effective_user_id(user_id),
             )
             return DeleteResult(**result)
+
+        @self.app.tool(
+            title="Post Message",
+            annotations=ToolAnnotations(
+                readOnlyHint=False,
+                destructiveHint=False,
+                idempotentHint=False,
+                openWorldHint=False,
+            ),
+        )
+        async def post_message(
+            model: str,
+            body: str,
+            record_id: Optional[int] = None,
+            res_id: Optional[int] = None,
+            subtype: str = "comment",
+            message_type: str = "comment",
+            subject: Optional[str] = None,
+            partner_ids: Optional[List[int]] = None,
+            attachment_ids: Optional[List[int]] = None,
+            author_id: Optional[int] = None,
+            user_id: Optional[int] = None,
+            ctx: Optional[Context] = None,
+        ) -> PostMessageResult:
+            """Post a message to a record's chatter.
+
+            Use this rather than creating a mail.message directly: this goes
+            through message_post, so followers are notified, @mentions resolve
+            and the bus event fires — a hand-built mail.message does none of
+            that. Returns the new message's ID.
+
+            Args:
+                model: Model of the thread to post on (e.g. 'project.task').
+                body: Message body. HTML is rendered, not escaped.
+                record_id: ID of the record to post on.
+                res_id: Accepted as an alias for record_id.
+                subtype: 'comment' (default, notifies followers) or 'note'
+                    (internal). A full xmlid such as 'mail.mt_comment' also works.
+                message_type: 'comment' (default) or 'notification'.
+                subject: Optional message subject.
+                partner_ids: Partner IDs to notify — the @mention recipients.
+                attachment_ids: IDs of existing ir.attachment records to attach.
+                author_id: Partner ID to post as. Defaults to the calling user's
+                    partner.
+                user_id: Optional Odoo user ID to post as. Requires the
+                    foxlogik_mcp_proxy module.
+
+            Returns:
+                Confirmation carrying the created message's ID.
+            """
+            result = await self._handle_post_message_tool(
+                model,
+                self._resolve_record_id(record_id, res_id),
+                body,
+                subtype=subtype,
+                message_type=message_type,
+                subject=subject,
+                partner_ids=partner_ids,
+                attachment_ids=attachment_ids,
+                author_id=author_id,
+                ctx=ctx,
+                user_id=self._effective_user_id(user_id),
+            )
+            return PostMessageResult(**result)
 
         @self.app.tool(
             title="Call Method",
@@ -1790,6 +1855,90 @@ class OdooToolHandler:
                 f"'{name}' must be a {expect.__name__} (got {type(value).__name__})"
             )
         return value
+
+    async def _handle_post_message_tool(
+        self,
+        model: str,
+        record_id: int,
+        body: str,
+        subtype: str = "comment",
+        message_type: str = "comment",
+        subject: Optional[str] = None,
+        partner_ids: Optional[List[int]] = None,
+        attachment_ids: Optional[List[int]] = None,
+        author_id: Optional[int] = None,
+        ctx=None,
+        user_id: Optional[int] = None,
+    ) -> Dict[str, Any]:
+        """Handle post_message tool request.
+
+        Routed through res.users.mcp_post_message rather than calling
+        message_post directly: message_post returns a mail.message recordset,
+        which XML-RPC cannot marshal, so a direct call commits the message and
+        then fails the response — an error the caller is invited to retry,
+        duplicating the post. The proxy method returns the message's ID.
+        """
+        try:
+            with perf_logger.track_operation("tool_post_message", model=model):
+                # Posting writes to the thread, so it needs write access to it.
+                self.access_controller.validate_model_access(model, "write")
+
+                if not self.connection.is_authenticated:
+                    raise ValidationError("Not authenticated with Odoo")
+
+                if not body or not body.strip():
+                    raise ValidationError("Cannot post an empty message body.")
+
+                values: Dict[str, Any] = {
+                    "body": body,
+                    "message_type": message_type,
+                    "subtype_xmlid": subtype,
+                }
+                if subject:
+                    values["subject"] = subject
+                if partner_ids:
+                    values["partner_ids"] = list(partner_ids)
+                if attachment_ids:
+                    values["attachment_ids"] = list(attachment_ids)
+                if author_id:
+                    values["author_id"] = author_id
+
+                await self._ctx_info(ctx, f"Posting to {model} {record_id}...")
+
+                message_id = self.connection.execute_kw(
+                    "res.users",
+                    "mcp_post_message",
+                    [model, record_id, values],
+                    {"user_id": user_id} if user_id is not None else {},
+                )
+
+                return {
+                    "success": True,
+                    "model": model,
+                    "record_id": record_id,
+                    "message_id": message_id,
+                    "url": self.connection.build_record_url(model, record_id),
+                    "message": f"Posted message {message_id} to {model} {record_id}",
+                }
+
+        except ValidationError:
+            raise
+        except AccessControlError as e:
+            raise ValidationError(f"Access denied: {e}") from e
+        except OdooConnectionError as e:
+            # The helper ships with foxlogik_mcp_proxy. Without it Odoo answers
+            # with a bare attribute error, which says nothing about the fix.
+            if "mcp_post_message" in str(e):
+                raise ValidationError(
+                    "post_message needs the foxlogik_mcp_proxy module (>= 17.0.1.3.0) "
+                    "installed on this database. Install or upgrade it, or post by "
+                    "creating a mail.message with create_record."
+                ) from e
+            raise ValidationError(f"Connection error: {e}") from e
+        except Exception as e:
+            logger.error(f"Error in post_message tool: {e}")
+            sanitized_msg = ErrorSanitizer.sanitize_message(str(e))
+            raise ValidationError(f"Failed to post message: {sanitized_msg}") from e
 
     async def _handle_call_method_tool(
         self,

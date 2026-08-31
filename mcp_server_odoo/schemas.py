@@ -209,6 +209,17 @@ class AccessCheckResult(BaseModel):
 # --- Call Method ---
 
 
+class PostMessageResult(BaseModel):
+    """Result of posting a chatter message via the post_message tool."""
+
+    success: bool = Field(description="Whether the message was posted")
+    model: str = Field(description="Model of the thread the message was posted on")
+    record_id: int = Field(description="ID of the record the message was posted on")
+    message_id: int = Field(description="ID of the created mail.message")
+    url: Optional[str] = Field(default=None, description="Web URL of the record")
+    message: str = Field(description="Human-readable confirmation message")
+
+
 class CallMethodResult(BaseModel):
     """Result of calling an allowlisted model method via the call_method tool."""
 
