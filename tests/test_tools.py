@@ -83,6 +83,7 @@ class TestOdooToolHandler:
             "update_record",
             "delete_record",
             "list_resource_templates",
+            "post_message",
             "call_method",
             "get_fields",
             "get_defaults",
